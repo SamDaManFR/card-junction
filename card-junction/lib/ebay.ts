@@ -24,7 +24,7 @@ export async function getEbayAppToken(): Promise<string> {
     grant_type: "client_credentials",
     // Buy Browse scope (required to call the Browse API).
     // If your keyset doesn't include this scope yet, enable it in your eBay Developer account.
-    scope: "https://api.ebay.com/oauth/api_scope/buy.browse"
+    scope: "https://api.ebay.com/oauth/api_scope"
   });
 
   const res = await fetch(tokenUrl, {
