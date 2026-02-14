@@ -7,8 +7,8 @@ export default async function ItemPage({
 }: {
   params: Promise<{ itemId: string }>;
 }) {
-  const { itemId } = await params;
-
+  const { itemId: itemIdParam } = await params;
+  const itemId = decodeURIComponent(itemIdParam);
   // Call eBay directly from the server (avoid fetch("/api/...") on the server)
   const item = await ebayGetItem(itemId);
 
