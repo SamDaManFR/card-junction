@@ -67,7 +67,7 @@ setItems(arr);
     const extra = mode === "auction" ? "Auctions only" : mode === "buynow" ? "Buy It Now only" : "Auctions + Buy It Now";
     return `${extra} • PSA-only • Graded only • Sorted: ending soon`;
   }, [mode]);
-  #addedhere
+//  #addedhere
 const filteredItems = useMemo(() => {
   if (grade === "all") return items;
   return items.filter((it) => {
@@ -97,7 +97,7 @@ const snapshot = useMemo(() => {
     currency,
   };
 }, [filteredItems]);
-   #endedhere
+ //  #endedhere
      
 const quickSearches = [
   { label: "Vintage: 1952 Topps Mantle", q: "1952 Topps Mantle" },
@@ -145,7 +145,7 @@ const quickSearches = [
         {filteredItems.map((it) => {
           const { psaGrade, psaCert } = extractPsaGradeAndCert(it.title);
           const ends = formatEnds(it.itemEndDate);
-      #addedcodehere
+  //    #addedcodehere
       function getPriceNumber(p?: { value: string; currency: string }) {
         if (!p) return null;
         const n = Number(p.value);
@@ -158,7 +158,7 @@ const quickSearches = [
         if (!Number.isFinite(ms)) return false;
         return ms > 0 && ms <= hours * 3_600_000;
         }
-       #stoppedhere    
+   //    #stoppedhere    
       return (
             <a key={it.itemId} className="card" href={`/items/${encodeURIComponent(it.itemId)}`} style={{textDecoration:"none"}}>
               {it.image?.imageUrl ? (
