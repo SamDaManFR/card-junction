@@ -31,6 +31,19 @@ function formatEnds(end?: string) {
   return `Ends in ${hours}h ${mins}m`;
 }
 
+function getPriceNumber(p?: { value: string; currency: string }) {
+  if (!p) return null;
+  const n = Number(p.value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function endsWithinHours(end?: string, hours = 2) {
+  if (!end) return false;
+  const ms = new Date(end).getTime() - Date.now();
+  if (!Number.isFinite(ms)) return false;
+  return ms > 0 && ms <= hours * 3_600_000;
+}
+
 export default function SearchClient() {
   const [q, setQ] = useState("Ohtani rookie");
   const [mode, setMode] = useState<"all"|"auction"|"buynow">("all");
@@ -77,9 +90,9 @@ const filteredItems = useMemo(() => {
 }, [items, grade]);
 
 const snapshot = useMemo(() => {
-  const prices = filteredItems
-    .map((it) => getPriceNumber(it.price))
-    .filter((n): n is number => typeof n === "number");
+const prices = filteredItems
+  .map((it) => getPriceNumber(it.price))
+  .filter((n): n is number => typeof n === "number");
 
   const lowest = prices.length ? Math.min(...prices) : null;
   const highest = prices.length ? Math.max(...prices) : null;
