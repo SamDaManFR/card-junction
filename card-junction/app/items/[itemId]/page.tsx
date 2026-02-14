@@ -8,8 +8,13 @@ async function getItem(itemId: string) {
   return json;
 }
 
-export default async function ItemPage({ params }: { params: { itemId: string } }) {
-  const item = await getItem(params.itemId);
+export default async function ItemPage({
+  params,
+}: {
+  params: Promise<{ itemId: string }>;
+}) {
+  const { itemId } = await params;
+  const item = await getItem(itemId);
   const title: string = item?.title ?? "Item";
   const img: string | undefined = item?.image?.imageUrl;
   const price = item?.price ? `${item.price.value} ${item.price.currency}` : "—";
