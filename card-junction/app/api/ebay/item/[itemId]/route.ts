@@ -1,3 +1,6 @@
+import { NextResponse } from "next/server";
+import { ebayGetItem } from "@/lib/ebay";
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ itemId: string }> }
