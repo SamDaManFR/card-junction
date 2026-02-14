@@ -38,6 +38,7 @@ export default function SearchClient() {
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [grade, setGrade] = useState<"all" | "7" | "8" | "9" | "10">("all");
 
   async function runSearch() {
     setError("");
@@ -66,8 +67,38 @@ setItems(arr);
     const extra = mode === "auction" ? "Auctions only" : mode === "buynow" ? "Buy It Now only" : "Auctions + Buy It Now";
     return `${extra} • PSA-only • Graded only • Sorted: ending soon`;
   }, [mode]);
+  #addedhere
+const filteredItems = useMemo(() => {
+  if (grade === "all") return items;
+  return items.filter((it) => {
+    const { psaGrade } = extractPsaGradeAndCert(it.title);
+    return psaGrade === grade;
+  });
+}, [items, grade]);
 
+const snapshot = useMemo(() => {
+  const prices = filteredItems
+    .map((it) => getPriceNumber(it.price))
+    .filter((n): n is number => typeof n === "number");
 
+  const lowest = prices.length ? Math.min(...prices) : null;
+  const highest = prices.length ? Math.max(...prices) : null;
+
+  const endingSoonCount = filteredItems.filter((it) => endsWithinHours(it.itemEndDate, 2)).length;
+
+  // Currency assumption: search results typically share one currency. We’ll use the first item’s currency if present.
+  const currency = filteredItems.find((it) => it.price?.currency)?.price?.currency ?? "USD";
+
+  return {
+    count: filteredItems.length,
+    lowest,
+    highest,
+    endingSoonCount,
+    currency,
+  };
+}, [filteredItems]);
+   #endedhere
+     
 const quickSearches = [
   { label: "Vintage: 1952 Topps Mantle", q: "1952 Topps Mantle" },
   { label: "Vintage: 1989 Upper Deck Griffey", q: "1989 Upper Deck Ken Griffey Jr #1" },
@@ -107,14 +138,28 @@ const quickSearches = [
       {error ? <p style={{color: "#b91c1c"}}>{error}</p> : null}
 
       <div style={{marginTop: 14}} className="muted small">
-        Showing {items.length} of {total} results
+        Showing {filteredItems.length} of {total} results
       </div>
 
       <div style={{marginTop: 12}} className="results">
-        {items.map((it) => {
+        {filteredItems.map((it) => {
           const { psaGrade, psaCert } = extractPsaGradeAndCert(it.title);
           const ends = formatEnds(it.itemEndDate);
-          return (
+      #addedcodehere
+      function getPriceNumber(p?: { value: string; currency: string }) {
+        if (!p) return null;
+        const n = Number(p.value);
+        return Number.isFinite(n) ? n : null;
+        }
+
+      function endsWithinHours(end?: string, hours = 2) {
+        if (!end) return false;
+        const ms = new Date(end).getTime() - Date.now();
+        if (!Number.isFinite(ms)) return false;
+        return ms > 0 && ms <= hours * 3_600_000;
+        }
+       #stoppedhere    
+      return (
             <a key={it.itemId} className="card" href={`/items/${encodeURIComponent(it.itemId)}`} style={{textDecoration:"none"}}>
               {it.image?.imageUrl ? (
                 <Image className="itemimg" src={it.image.imageUrl} alt={it.title} width={640} height={640} />
