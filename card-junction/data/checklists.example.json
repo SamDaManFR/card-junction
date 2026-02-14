@@ -1,0 +1,25 @@
+{
+  "sport": "baseball",
+  "sets": [
+    {
+      "id": "2024-topps-series-1",
+      "year": 2024,
+      "brand": "Topps",
+      "name": "Series 1",
+      "cards": [
+        {
+          "cardNumber": "1",
+          "player": "Example Player",
+          "team": "Example Team",
+          "notes": "Base"
+        },
+        {
+          "cardNumber": "2",
+          "player": "Another Player",
+          "team": "Another Team",
+          "notes": "Base"
+        }
+      ]
+    }
+  ]
+}
