@@ -123,19 +123,32 @@ const quickSearches = [
   return (
     <div className="card">
       <div className="row">
-        <div>
-          <div className="muted small">Search</div>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…" />
-        </div>
+  <div>
+    <div className="muted small">Search</div>
+    <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…" />
+  </div>
 
-        <div>
-          <div className="muted small">Mode</div>
-          <select value={mode} onChange={(e) => setMode(e.target.value as any)}>
-            <option value="all">All</option>
-            <option value="auction">Auctions</option>
-            <option value="buynow">Buy It Now</option>
-          </select>
-        </div>
+  <div>
+    <div className="muted small">Mode</div>
+    <select value={mode} onChange={(e) => setMode(e.target.value as any)}>
+      <option value="all">All</option>
+      <option value="auction">Auctions</option>
+      <option value="buynow">Buy It Now</option>
+    </select>
+  </div>
+
+  <div>
+    <div className="muted small">Grade (PSA)</div>
+    <select value={grade} onChange={(e) => setGrade(e.target.value as any)}>
+      <option value="all">All grades</option>
+      <option value="10">PSA 10</option>
+      <option value="9">PSA 9</option>
+      <option value="8">PSA 8</option>
+      <option value="7">PSA 7</option>
+    </select>
+  </div>
+</div>
+
       </div>
 
       <div style={{display:"flex", gap: 10, marginTop: 12, alignItems: "center"}}>
@@ -147,6 +160,27 @@ const quickSearches = [
         </button>
         <div className="muted small">{subtitle}</div>
       </div>
+
+<div style={{ marginTop: 12 }} className="card">
+  <div className="muted small">Market Snapshot (active listings)</div>
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+    <span className="pill">Count: {snapshot.count}</span>
+    <span className="pill">
+      Lowest:{" "}
+      {snapshot.lowest === null
+        ? "—"
+        : new Intl.NumberFormat(undefined, { style: "currency", currency: snapshot.currency }).format(snapshot.lowest)}
+    </span>
+    <span className="pill">
+      Highest:{" "}
+      {snapshot.highest === null
+        ? "—"
+        : new Intl.NumberFormat(undefined, { style: "currency", currency: snapshot.currency }).format(snapshot.highest)}
+    </span>
+    <span className="pill">Ending &lt; 2h: {snapshot.endingSoonCount}</span>
+  </div>
+</div>
+
 
       {error ? <p style={{color: "#b91c1c"}}>{error}</p> : null}
 
