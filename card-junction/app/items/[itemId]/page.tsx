@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { extractPsaGradeAndCert } from "@/lib/parse";
 import { ebayGetItem } from "@/lib/ebay";
+import { buildMarketplaceQuery, marketplaces } from "@/lib/marketplaces";
 
 export default async function ItemPage({
   params,
@@ -13,6 +14,7 @@ export default async function ItemPage({
   const item = await ebayGetItem(itemId);
 
   const title: string = item?.title ?? "Item";
+  const mq = buildMarketplaceQuery(title);
   const img: string | undefined = item?.image?.imageUrl;
   const price = item?.price ? `${item.price.value} ${item.price.currency}` : "—";
   const url: string | undefined = item?.itemWebUrl;
@@ -63,6 +65,33 @@ export default async function ItemPage({
                 ) : (
                   <span className="muted small">No URL found</span>
                 )}
+               <div className="card">
+  <div className="muted small">More marketplaces</div>
+  <div className="muted small" style={{ marginTop: 6 }}>
+    Searching for: <span style={{ fontWeight: 700 }}>{mq || "—"}</span>
+  </div>
+
+  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+    {marketplaces.map((m) => (
+      <a
+        key={m.key}
+        className="pill"
+        href={m.buildUrl(mq || title)}
+        target="_blank"
+        rel="noreferrer"
+        style={{ textDecoration: "none" }}
+        title={`Search on ${m.label}`}
+      >
+        {m.label}
+      </a>
+    ))}
+  </div>
+
+  <div className="muted small" style={{ marginTop: 10 }}>
+    Tip: Later we can replace these pills with logos (same links).
+  </div>
+</div>
+ 
               </div>
             </div>
           </div>
