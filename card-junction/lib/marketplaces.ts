@@ -35,8 +35,8 @@ export const marketplaces: MarketplaceLink[] = [
   {
     key: "goldin",
     label: "Goldin",
-    buildUrl: (q) =>
-    `https://goldin.co/search?q=${encodeURIComponent(q)}`,
+    //buildUrl: (q) =>`https://goldin.co/search?q=${encodeURIComponent(q)}`,
+    buildUrl: (q) => `https://goldin.co/buy/?search=${encodeURIComponent(q)}&sort=Featured&page=1&number_of_lots=24`,
   },
   {
     key: "fanatics",
@@ -46,7 +46,8 @@ export const marketplaces: MarketplaceLink[] = [
   {
     key: "alt",
     label: "ALT",
-    buildUrl: (q) => `https://app.alt.xyz/browse?q=${encodeURIComponent(q)}`,
+    //buildUrl: (q) => `https://app.alt.xyz/browse?q=${encodeURIComponent(q)}`,
+    buildUrl: (q) => `https://app.alt.xyz/browse?query=${encodeURIComponent(q)}&sortBy=newest_first`,
   },
   {
     key: "ebaylive",
