@@ -67,6 +67,21 @@ export default async function ItemPage({
                 )}
                <div className="card">
   <div className="muted small">More marketplaces</div>
+   <button
+  type="button"
+  className="pill"
+  onClick={async () => {
+    try {
+      await navigator.clipboard.writeText(mq || title);
+    } catch {
+      // fallback: do nothing
+    }
+  }}
+  style={{ cursor: "pointer" }}
+  title="Copy the cleaned search query"
+>
+  Copy query
+</button>              
   <div className="muted small" style={{ marginTop: 6 }}>
     Searching for: <span style={{ fontWeight: 700 }}>{mq || "—"}</span>
   </div>
