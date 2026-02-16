@@ -120,111 +120,135 @@ const quickSearches = [
   { label: "Both: Topps Chrome", q: "Topps Chrome" },
 ];
 
-  return (
-    <div className="card">
-      <div className="row">
-  <div>
-    <div className="muted small">Search</div>
-    <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…" />
-  </div>
-
-  <div>
-    <div className="muted small">Mode</div>
-    <select value={mode} onChange={(e) => setMode(e.target.value as any)}>
-      <option value="all">All</option>
-      <option value="auction">Auctions</option>
-      <option value="buynow">Buy It Now</option>
-    </select>
-  </div>
-
-  <div>
-    <div className="muted small">Grade (PSA)</div>
-    <select value={grade} onChange={(e) => setGrade(e.target.value as any)}>
-      <option value="all">All grades</option>
-      <option value="10">PSA 10</option>
-      <option value="9">PSA 9</option>
-      <option value="8">PSA 8</option>
-      <option value="7">PSA 7</option>
-    </select>
-  </div>
-</div>
-
-      </div>
-
-      <div style={{display:"flex", gap: 10, marginTop: 12, alignItems: "center"}}>
-        <button onClick={runSearch} disabled={loading}>
-          {loading ? "Searching…" : "Search eBay"}
+return (
+  <div className="card">
+    <div className="muted small">Quick searches (both vintage + modern)</div>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8, marginBottom: 12 }}>
+      {quickSearches.map((s) => (
+        <button
+          key={s.label}
+          className="secondary"
+          onClick={() => {
+            setQ(s.q);
+          }}
+          type="button"
+          style={{ padding: "8px 10px" }}
+        >
+          {s.label}
         </button>
-        <button className="secondary" onClick={() => { setQ(""); setItems([]); setTotal(0); }}>
-          Clear
-        </button>
-        <div className="muted small">{subtitle}</div>
+      ))}
+    </div>
+
+    <div className="row">
+      <div>
+        <div className="muted small">Search</div>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…"
+        />
       </div>
 
-<div style={{ marginTop: 12 }} className="card">
-  <div className="muted small">Market Snapshot (active listings)</div>
-  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
-    <span className="pill">Count: {snapshot.count}</span>
-    <span className="pill">
-      Lowest:{" "}
-      {snapshot.lowest === null
-        ? "—"
-        : new Intl.NumberFormat(undefined, { style: "currency", currency: snapshot.currency }).format(snapshot.lowest)}
-    </span>
-    <span className="pill">
-      Highest:{" "}
-      {snapshot.highest === null
-        ? "—"
-        : new Intl.NumberFormat(undefined, { style: "currency", currency: snapshot.currency }).format(snapshot.highest)}
-    </span>
-    <span className="pill">Ending &lt; 2h: {snapshot.endingSoonCount}</span>
-  </div>
-</div>
-
-
-      {error ? <p style={{color: "#b91c1c"}}>{error}</p> : null}
-
-      <div style={{marginTop: 14}} className="muted small">
-        Showing {filteredItems.length} of {total} results
+      <div>
+        <div className="muted small">Mode</div>
+        <select value={mode} onChange={(e) => setMode(e.target.value as any)}>
+          <option value="all">All</option>
+          <option value="auction">Auctions</option>
+          <option value="buynow">Buy It Now</option>
+        </select>
       </div>
 
-      <div style={{marginTop: 12}} className="results">
-        {filteredItems.map((it) => {
-          const { psaGrade, psaCert } = extractPsaGradeAndCert(it.title);
-          const ends = formatEnds(it.itemEndDate);
-  //    #addedcodehere
-      function getPriceNumber(p?: { value: string; currency: string }) {
-        if (!p) return null;
-        const n = Number(p.value);
-        return Number.isFinite(n) ? n : null;
-        }
-
-      function endsWithinHours(end?: string, hours = 2) {
-        if (!end) return false;
-        const ms = new Date(end).getTime() - Date.now();
-        if (!Number.isFinite(ms)) return false;
-        return ms > 0 && ms <= hours * 3_600_000;
-        }
-   //    #stoppedhere    
-      return (
-            <a key={it.itemId} className="card" href={`/items/${encodeURIComponent(it.itemId)}`} style={{textDecoration:"none"}}>
-              {it.image?.imageUrl ? (
-                <Image className="itemimg" src={it.image.imageUrl} alt={it.title} width={640} height={640} />
-              ) : (
-                <div className="itemimg" />
-              )}
-              <div style={{height: 10}} />
-              <div style={{fontWeight: 700, lineHeight: 1.3}}>{it.title}</div>
-              <div style={{display:"flex", gap: 8, flexWrap:"wrap", marginTop: 8}}>
-                <span className="pill">{formatMoney(it.price)}</span>
-                {psaGrade ? <span className="pill">PSA {psaGrade}</span> : <span className="pill">PSA (unknown)</span>}
-                {psaCert ? <span className="pill">Cert {psaCert}</span> : null}
-                {ends ? <span className="pill">{ends}</span> : null}
-              </div>
-            </a>
-          );
-        })}
+      <div>
+        <div className="muted small">Grade (PSA)</div>
+        <select value={grade} onChange={(e) => setGrade(e.target.value as any)}>
+          <option value="all">All grades</option>
+          <option value="10">PSA 10</option>
+          <option value="9">PSA 9</option>
+          <option value="8">PSA 8</option>
+          <option value="7">PSA 7</option>
+        </select>
       </div>
     </div>
-  );
-}
+
+    <div style={{ display: "flex", gap: 10, marginTop: 12, alignItems: "center" }}>
+      <button onClick={runSearch} disabled={loading}>
+        {loading ? "Searching…" : "Search eBay"}
+      </button>
+      <button
+        className="secondary"
+        onClick={() => {
+          setQ("");
+          setItems([]);
+          setTotal(0);
+        }}
+      >
+        Clear
+      </button>
+      <div className="muted small">{subtitle}</div>
+    </div>
+
+    <div style={{ marginTop: 12 }} className="card">
+      <div className="muted small">Market Snapshot (active listings)</div>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+        <span className="pill">Count: {snapshot.count}</span>
+        <span className="pill">
+          Lowest:{" "}
+          {snapshot.lowest === null
+            ? "—"
+            : new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: snapshot.currency,
+              }).format(snapshot.lowest)}
+        </span>
+        <span className="pill">
+          Highest:{" "}
+          {snapshot.highest === null
+            ? "—"
+            : new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: snapshot.currency,
+              }).format(snapshot.highest)}
+        </span>
+        <span className="pill">Ending &lt; 2h: {snapshot.endingSoonCount}</span>
+      </div>
+    </div>
+
+    {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
+
+    <div style={{ marginTop: 14 }} className="muted small">
+      Showing {filteredItems.length} of {total} results
+    </div>
+
+    <div style={{ marginTop: 12 }} className="results">
+      {filteredItems.map((it) => {
+        const { psaGrade, psaCert } = extractPsaGradeAndCert(it.title);
+        const ends = formatEnds(it.itemEndDate);
+
+        return (
+          <a
+            key={it.itemId}
+            className="card"
+            href={`/items/${encodeURIComponent(it.itemId)}`}
+            style={{ textDecoration: "none" }}
+          >
+            {it.image?.imageUrl ? (
+              <Image className="itemimg" src={it.image.imageUrl} alt={it.title} width={640} height={640} />
+            ) : (
+              <div className="itemimg" />
+            )}
+
+            <div style={{ height: 10 }} />
+            <div style={{ fontWeight: 700, lineHeight: 1.3 }}>{it.title}</div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+              <span className="pill">{formatMoney(it.price)}</span>
+              {psaGrade ? <span className="pill">PSA {psaGrade}</span> : <span className="pill">PSA (unknown)</span>}
+              {psaCert ? <span className="pill">Cert {psaCert}</span> : null}
+              {ends ? <span className="pill">{ends}</span> : null}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+);
