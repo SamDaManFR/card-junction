@@ -41,7 +41,7 @@ export const marketplaces: MarketplaceLink[] = [
   {
     key: "fanatics",
     label: "Fanatics Collect",
-    buildUrl: (q) => `https://www.fanaticscollect.com/search?query=${encodeURIComponent(q)}`,
+    buildUrl: (q) => `https://www.fanaticscollect.com/marketplace?type=WEEKLY&q=${encodeURIComponent(q)}`,
   },
   {
     key: "alt",
