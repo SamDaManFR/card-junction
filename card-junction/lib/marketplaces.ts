@@ -57,6 +57,6 @@ export const marketplaces: MarketplaceLink[] = [
   {
     key: "veriswap",
     label: "Veriswap",
-    buildUrl: (q) => `https://veriswap.com/search?q=${encodeURIComponent(q)}`,
+    buildUrl: (_q) => `https://veriswap.com/search`,
   },
 ];
