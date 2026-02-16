@@ -46,8 +46,7 @@ export const marketplaces: MarketplaceLink[] = [
   {
     key: "alt",
     label: "ALT",
-    buildUrl: (q) =>
-    `https://www.google.com/search?q=site:alt.xyz+${encodeURIComponent(q)}`,
+    buildUrl: (q) => `https://app.alt.xyz/browse?q=${encodeURIComponent(q)}`,
   },
   {
     key: "ebaylive",
