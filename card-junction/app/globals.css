@@ -50,10 +50,12 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
 }
 
 .desktop-tagline {
+  border-bottom: 2px solid #b91c1c;
+  padding-bottom: 4px;
   display: none;
   color: white;
   font-weight: 800;
-  font-size: 26px;
+  font-size: 30px;
   letter-spacing: 1px;
   text-transform: uppercase;
   font-style: italic;
