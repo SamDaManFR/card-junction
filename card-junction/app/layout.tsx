@@ -37,7 +37,7 @@ export default function RootLayout({
               <Image
                 src="/logo.png"
                 alt="Card Junction"
-                width={250}
+                width={400}
                 height={70}
                 priority
               />
