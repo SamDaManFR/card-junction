@@ -36,19 +36,33 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   }
 }
 
+.logo-wrap {
+  position: absolute;
+  left: 40px;
+}
+
+.navbar-inner {
+  position: relative;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .desktop-tagline {
   display: none;
   color: white;
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   font-style: italic;
-  font-weight: 600;
-  font-size: 18px;
-  margin-left: 30px;
-  letter-spacing: 0.5px;
 }
 
-/* Show only on desktop */
+/* Desktop only */
 @media (min-width: 1024px) {
   .desktop-tagline {
     display: block;
   }
 }
+
