@@ -31,7 +31,9 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
 /* Desktop adjustment */
 @media (min-width: 1024px) {
   .navbar-inner {
-    padding-left: 0;
+    max-width: 100%;
+    padding-left: 40px;
   }
 }
+
 
