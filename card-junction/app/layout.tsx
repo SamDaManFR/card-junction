@@ -33,12 +33,12 @@ export default function RootLayout({
               alignItems: "center",
             }}
           >
-            <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+            <Link href="/" style={{ display: "flex", alignItems: "left" }}>
               <Image
                 src="/logo.png"
                 alt="Card Junction"
-                width={240}
-                height={60}
+                width={250}
+                height={70}
                 priority
               />
             </Link>
