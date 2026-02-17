@@ -20,28 +20,28 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header
-          style={{
-            background: "#000",
-            padding: "14px 0",
-            borderBottom: "3px solid #b91c1c",
-          }}
-        >
-          <div className="navbar-inner">
-  <Link href="/" style={{ display: "flex", alignItems: "center" }}>
-    <Image
-      src="/logo.png"
-      alt="Card Junction"
-      width={240}
-      height={60}
-      priority
-    />
-  </Link>
+  style={{
+    background: "#000",
+    padding: "18px 0",
+    borderBottom: "3px solid #b91c1c",
+  }}
+>
+  <div className="navbar-inner">
+    <Link href="/" className="logo-wrap">
+      <Image
+        src="/logo.png"
+        alt="Card Junction"
+        width={240}
+        height={60}
+        priority
+      />
+    </Link>
 
-  <div className="desktop-tagline">
-    Where all your card needs meet
+    <div className="desktop-tagline">
+      Where All Your Card Needs Meet
+    </div>
   </div>
-</div>
-        </header>
+</header>
 
         <main>{children}</main>
       </body>
