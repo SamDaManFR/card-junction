@@ -36,4 +36,18 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   }
 }
 
+.desktop-tagline {
+  display: none;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  margin-left: 30px;
+  letter-spacing: 0.5px;
+}
 
+/* Show only on desktop */
+@media (min-width: 1024px) {
+  .desktop-tagline {
+    display: block;
+  }
+}
