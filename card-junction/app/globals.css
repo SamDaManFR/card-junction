@@ -28,43 +28,46 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   align-items: center;
 }
 
-/* Desktop adjustment */
-@media (min-width: 1024px) {
-  .navbar-inner {
-    max-width: 100%;
-    padding-left: 40px;
-  }
-}
-
-.logo-wrap {
-  position: absolute;
-  left: 40px;
-}
-
+/* Base (Mobile First) */
 .navbar-inner {
   position: relative;
-  max-width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;   /* 👈 restores mobile padding */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.desktop-tagline {
-  border-bottom: 2px solid #b91c1c;
-  padding-bottom: 4px;
-  display: none;
-  color: white;
-  font-weight: 800;
-  font-size: 30px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-style: italic;
+.logo-wrap {
+  position: static;  /* 👈 important for mobile */
 }
 
-/* Desktop only */
+.desktop-tagline {
+  display: none;
+}
+
+/* Desktop Only */
 @media (min-width: 1024px) {
+  .navbar-inner {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .logo-wrap {
+    position: absolute;
+    left: 40px;
+  }
+
   .desktop-tagline {
     display: block;
+    color: white;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-style: italic;
   }
 }
+
 
