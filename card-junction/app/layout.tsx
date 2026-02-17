@@ -26,13 +26,7 @@ export default function RootLayout({
             borderBottom: "3px solid #b91c1c",
           }}
         >
-          <div
-            className="container"
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
+          <div className="navbar-inner">
             <Link href="/" style={{ display: "flex", alignItems: "center" }}>
               <Image
                 src="/logo.png"
