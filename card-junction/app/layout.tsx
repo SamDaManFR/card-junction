@@ -27,16 +27,20 @@ export default function RootLayout({
           }}
         >
           <div className="navbar-inner">
-            <Link href="/" style={{ display: "flex", alignItems: "center" }}>
-              <Image
-                src="/logo.png"
-                alt="Card Junction"
-                width={240}
-                height={70}
-                priority
-              />
-            </Link>
-          </div>
+  <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+    <Image
+      src="/logo.png"
+      alt="Card Junction"
+      width={240}
+      height={60}
+      priority
+    />
+  </Link>
+
+  <div className="desktop-tagline">
+    Where all your card needs meet
+  </div>
+</div>
         </header>
 
         <main>{children}</main>
