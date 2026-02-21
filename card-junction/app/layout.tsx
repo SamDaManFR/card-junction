@@ -41,6 +41,40 @@ export default function RootLayout({
       Where All Your Card Needs Meet
     </div>
   </div>
+  <nav className="topnav">
+  <a className="navlink" href="/">Search</a>
+
+  <div className="navgroup">
+    <span className="navlabel">Grading ▾</span>
+    <div className="navmenu">
+      <a className="navitem" href="/grading/psa">PSA</a>
+      <a className="navitem" href="/grading/bgs">BGS</a>
+      <a className="navitem" href="/grading/sgc">SGC</a>
+    </div>
+  </div>
+
+  <div className="navgroup">
+    <span className="navlabel">Livestream Shows ▾</span>
+    <div className="navmenu">
+      <a className="navitem" href="/livestreams/whatnot">Whatnot</a>
+      <a className="navitem" href="/livestreams/ebay-live">eBay Live</a>
+    </div>
+  </div>
+
+  <a className="navlink" href="/local-shows">Local Card Shows</a>
+  <a className="navlink" href="/checklists">Checklists</a>
+  <a className="navlink" href="/suppliers">Suppliers</a>
+  <a className="navlink" href="/pro">Pro</a>
+
+  <div className="navgroup">
+    <span className="navlabel">User ▾</span>
+    <div className="navmenu">
+      <a className="navitem" href="/user/wishlist">Wish List</a>
+      <a className="navitem" href="/user/collection">Collection</a>
+      <a className="navitem" href="/user/sales">Sales</a>
+    </div>
+  </div>
+</nav>        
 </header>
 
         <main>{children}</main>
