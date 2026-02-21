@@ -45,21 +45,21 @@ export default function RootLayout({
   <a className="navlink" href="/">Search</a>
 
   <div className="navgroup">
-    <span className="navlabel">Grading ▾</span>
-    <div className="navmenu">
-      <a className="navitem" href="/grading/psa">PSA</a>
-      <a className="navitem" href="/grading/bgs">BGS</a>
-      <a className="navitem" href="/grading/sgc">SGC</a>
-    </div>
+  <a className="navlabel" href="/grading">Grading ▾</a>
+  <div className="navmenu">
+    <a className="navitem" href="/grading/psa">PSA</a>
+    <a className="navitem" href="/grading/bgs">BGS</a>
+    <a className="navitem" href="/grading/sgc">SGC</a>
   </div>
+</div>
 
   <div className="navgroup">
-    <span className="navlabel">Livestream Shows ▾</span>
-    <div className="navmenu">
-      <a className="navitem" href="/livestreams/whatnot">Whatnot</a>
-      <a className="navitem" href="/livestreams/ebay-live">eBay Live</a>
-    </div>
+  <a className="navlabel" href="/livestreams">Livestream Shows ▾</a>
+  <div className="navmenu">
+    <a className="navitem" href="/livestreams/whatnot">Whatnot</a>
+    <a className="navitem" href="/livestreams/ebay-live">eBay Live</a>
   </div>
+</div>
 
   <a className="navlink" href="/local-shows">Local Card Shows</a>
   <a className="navlink" href="/checklists">Checklists</a>
