@@ -179,7 +179,7 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
     top: 160px;              /* below header */
     width: 260px;
     height: 70vh;
-    opacity: 0.14;           /* subtle */
+    opacity: 0.5;           /* subtle */
     pointer-events: none;    /* never blocks clicks */
     z-index: 0;
     background-repeat: no-repeat;
