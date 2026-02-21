@@ -29,25 +29,85 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
 }
 
 /* Base (Mobile First) */
+/* ===== Header layout ===== */
 .navbar-inner {
   position: relative;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 16px;   /* 👈 restores mobile padding */
+  padding: 0 16px;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* centers logo on mobile */
   align-items: center;
 }
 
 .logo-wrap {
-  position: static;  /* 👈 important for mobile */
+  position: static;
 }
 
 .desktop-tagline {
   display: none;
 }
 
-/* Desktop Only */
+/* Centered nav wrapper */
+.topnav-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 0 16px; /* keeps nav from touching edges on mobile */
+}
+
+.topnav {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center; /* centers nav items on mobile */
+}
+
+/* ===== Nav item styling ===== */
+.navlink,
+.navlabel {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navlink:hover,
+.navlabel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navgroup {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navmenu {
+  display: none; /* default hidden */
+}
+
+.navitem {
+  display: block;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 10px;
+  border-radius: 10px;
+}
+
+.navitem:hover {
+  background: rgba(185, 28, 28, 0.25);
+}
+
+/* ===== Desktop dropdown behavior ===== */
 @media (min-width: 1024px) {
   .navbar-inner {
     max-width: 100%;
@@ -70,131 +130,36 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
     border-bottom: 2px solid #b91c1c;
     padding-bottom: 3px;
   }
-  
-}
-.topnav {
-  margin-top: 10px;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  align-items: center;
-}
 
-.navlink, .navlabel {
-  color: white;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 8px 10px;
-  border-radius: 999px;
-}
-
-.navlink:hover, .navlabel:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.navgroup {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.navmenu {
-  display: none;
-  position: absolute;
-  top: 38px;
-  left: 0;
-  min-width: 160px;
-  background: #0b0b0b;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  padding: 8px;
-  z-index: 50;
-}
-
-.navgroup:hover .navmenu {
-  display: block;
-}
-
-.navitem {
-  display: block;
-  color: white;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 10px 10px;
-  border-radius: 10px;
-}
-
-.navitem:hover {
-  background: rgba(185, 28, 28, 0.25); /* your red accent */
-}
-
-@media (max-width: 768px) {
-  .navmenu {
-    position: static;
-    display: block;
-    background: transparent;
-    border: none;
+  .topnav-wrapper {
     padding: 0;
+  }
+
+  .topnav {
+    justify-content: center;
+  }
+
+  .navmenu {
+    position: absolute;
+    top: 38px;
+    left: 0;
+    min-width: 160px;
+    background: #0b0b0b;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 8px;
+    z-index: 50;
+  }
+
+  .navgroup:hover .navmenu {
+    display: block;
   }
 }
 
-/* Subtle hover lift on cards */
-.card {
-  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
-  border-color: rgba(185, 28, 28, 0.35);
-}
-
-/* Red hover accent on pills and buttons */
-.pill,
-button,
-.navlink,
-.navlabel,
-.navitem {
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease, color 120ms ease;
-}
-
-/* Pills */
-.pill:hover {
-  background: rgba(185, 28, 28, 0.18);
-  border-color: rgba(185, 28, 28, 0.55);
-  transform: translateY(-1px);
-}
-
-/* Buttons (primary + secondary) */
-button:hover {
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
-  transform: translateY(-1px);
-}
-
-button.secondary:hover {
-  border-color: rgba(185, 28, 28, 0.55);
-  background: rgba(185, 28, 28, 0.10);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .card:hover { transform: translateY(-2px); }
-  .pill:hover { transform: translateY(-1px); }
-  button:hover { transform: translateY(-1px); }
-}
-
-/* NAV WRAPPER */
-.topnav-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-/* Actual nav row */
-.topnav {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  align-items: center;
+/* ===== Mobile behavior: no dropdown expansion ===== */
+@media (max-width: 1023px) {
+  /* Keep menus hidden so mobile nav stays compact */
+  .navmenu {
+    display: none !important;
+  }
 }
