@@ -83,7 +83,11 @@ export default function RootLayout({
           </nav>
         </header>
 
-        <main>{children}</main>
+        <div className="page-shell">
+  <div className="side-rail left" aria-hidden="true" />
+  <div className="side-rail right" aria-hidden="true" />
+  <main>{children}</main>
+</div>
       </body>
     </html>
   );
