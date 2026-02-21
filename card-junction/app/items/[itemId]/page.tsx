@@ -73,20 +73,35 @@ export default async function ItemPage({
   </div>
 
   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-    {marketplaces.map((m) => (
-      <a
-        key={m.key}
-        className="pill"
-        href={m.buildUrl(mq || title)}
-        target="_blank"
-        rel="noreferrer"
-        style={{ textDecoration: "none" }}
-        title={`Search on ${m.label}`}
-      >
-        {m.label}
-      </a>
-    ))}
-  </div>
+  {marketplaces.map((m) => (
+    <a
+      key={m.key}
+      className="pill"
+      href={m.buildUrl(mq || title)}
+      target="_blank"
+      rel="noreferrer"
+      style={{
+        textDecoration: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 12px",
+      }}
+      title={`Search on ${m.label}`}
+    >
+      {m.logoPath ? (
+        <Image
+          src={m.logoPath}
+          alt={m.label}
+          width={22}
+          height={22}
+          style={{ objectFit: "contain" }}
+        />
+      ) : null}
+      <span style={{ fontWeight: 700 }}>{m.label}</span>
+    </a>
+  ))}
+</div>
 
   <div className="muted small" style={{ marginTop: 10 }}>
     Tip: Later we can replace these pills with logos (same links).
