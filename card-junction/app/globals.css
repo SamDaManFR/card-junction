@@ -163,3 +163,47 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
     display: none !important;
   }
 }
+.page-shell {
+  position: relative;
+}
+
+/* hidden by default (mobile/tablet) */
+.side-rail {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .side-rail {
+    display: block;
+    position: fixed;
+    top: 160px;              /* below header */
+    width: 260px;
+    height: 70vh;
+    opacity: 0.14;           /* subtle */
+    pointer-events: none;    /* never blocks clicks */
+    z-index: 0;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 10px 16px rgba(0,0,0,0.22));
+  }
+
+  .side-rail.left {
+    left: 18px;
+    background-image: url("/decor/left-card.png");
+    background-position: left top;
+    transform: rotate(-6deg);
+  }
+
+  .side-rail.right {
+    right: 18px;
+    background-image: url("/decor/right-card.png");
+    background-position: right top;
+    transform: rotate(6deg);
+  }
+
+  /* ensure content sits above rails */
+  main {
+    position: relative;
+    z-index: 1;
+  }
+}
