@@ -41,7 +41,8 @@ export default function RootLayout({
       Where All Your Card Needs Meet
     </div>
   </div>
-  <nav className="topnav">
+  <nav className="topnav-wrapper">
+    <div className="topnav">
   <a className="navlink" href="/">Search</a>
 
  <div className="navgroup">
