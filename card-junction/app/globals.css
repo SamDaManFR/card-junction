@@ -140,3 +140,46 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   }
 }
 
+/* Subtle hover lift on cards */
+.card {
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  border-color: rgba(185, 28, 28, 0.35);
+}
+
+/* Red hover accent on pills and buttons */
+.pill,
+button,
+.navlink,
+.navlabel,
+.navitem {
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+/* Pills */
+.pill:hover {
+  background: rgba(185, 28, 28, 0.18);
+  border-color: rgba(185, 28, 28, 0.55);
+  transform: translateY(-1px);
+}
+
+/* Buttons (primary + secondary) */
+button:hover {
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+button.secondary:hover {
+  border-color: rgba(185, 28, 28, 0.55);
+  background: rgba(185, 28, 28, 0.10);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover { transform: translateY(-2px); }
+  .pill:hover { transform: translateY(-1px); }
+  button:hover { transform: translateY(-1px); }
+}
