@@ -183,3 +183,18 @@ button.secondary:hover {
   .pill:hover { transform: translateY(-1px); }
   button:hover { transform: translateY(-1px); }
 }
+
+/* NAV WRAPPER */
+.topnav-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* Actual nav row */
+.topnav {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
