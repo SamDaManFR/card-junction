@@ -44,8 +44,10 @@ export default function RootLayout({
   <nav className="topnav">
   <a className="navlink" href="/">Search</a>
 
-  <div className="navgroup">
-  <a className="navlabel" href="/grading">Grading ▾</a>
+ <div className="navgroup">
+  <a className="navlabel" href="/grading">
+    Grading <span className="caret">▾</span>
+  </a>
   <div className="navmenu">
     <a className="navitem" href="/grading/psa">PSA</a>
     <a className="navitem" href="/grading/bgs">BGS</a>
@@ -53,11 +55,13 @@ export default function RootLayout({
   </div>
 </div>
 
-  <div className="navgroup">
-  <a className="navlabel" href="/livestreams">Livestream Shows ▾</a>
+ <div className="navgroup">
+  <a className="navlabel" href="/livestreams">
+    Livestream Shows <span className="caret">▾</span>
+  </a>
   <div className="navmenu">
     <a className="navitem" href="/livestreams/whatnot">Whatnot</a>
-    <a className="navitem" href="/livestreams/ebay live">eBay Live</a>
+    <a className="navitem" href="/livestreams/ebay-live">eBay Live</a>
   </div>
 </div>
 
