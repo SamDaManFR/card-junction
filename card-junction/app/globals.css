@@ -70,6 +70,73 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
     border-bottom: 2px solid #b91c1c;
     padding-bottom: 3px;
   }
+  
+}
+.topnav {
+  margin-top: 10px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
+.navlink, .navlabel {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 999px;
+}
+
+.navlink:hover, .navlabel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navgroup {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navmenu {
+  display: none;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  min-width: 160px;
+  background: #0b0b0b;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 8px;
+  z-index: 50;
+}
+
+.navgroup:hover .navmenu {
+  display: block;
+}
+
+.navitem {
+  display: block;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 10px;
+  border-radius: 10px;
+}
+
+.navitem:hover {
+  background: rgba(185, 28, 28, 0.25); /* your red accent */
+}
+
+@media (max-width: 768px) {
+  .navmenu {
+    position: static;
+    display: block;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+}
 
