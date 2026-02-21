@@ -57,7 +57,7 @@ export default function RootLayout({
   <a className="navlabel" href="/livestreams">Livestream Shows ▾</a>
   <div className="navmenu">
     <a className="navitem" href="/livestreams/whatnot">Whatnot</a>
-    <a className="navitem" href="/livestreams/ebay-live">eBay Live</a>
+    <a className="navitem" href="/livestreams/ebay live">eBay Live</a>
   </div>
 </div>
 
