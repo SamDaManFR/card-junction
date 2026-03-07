@@ -188,14 +188,14 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   }
 
   .side-rail.left {
-    left: 50px;
+    left: 100px;
     background-image: url("/decor/left-card.png");
     background-position: left top;
     transform: rotate(-6deg);
   }
 
   .side-rail.right {
-    right: 50px;
+    right: 100px;
     background-image: url("/decor/right-card.png");
     background-position: right top;
     transform: rotate(6deg);
