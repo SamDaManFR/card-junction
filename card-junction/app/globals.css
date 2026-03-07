@@ -195,7 +195,7 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   }
 
   .side-rail.right {
-    right: 18px;
+    right: 50px;
     background-image: url("/decor/right-card.png");
     background-position: right top;
     transform: rotate(6deg);
