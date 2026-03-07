@@ -97,7 +97,16 @@ const prices = filteredItems
   const lowest = prices.length ? Math.min(...prices) : null;
   const average = prices.length ? prices.reduce((sum, p) => sum + p, 0) / prices.length: null;
   const highest = prices.length ? Math.max(...prices) : null;
+  const sortedPrices = [...prices].sort((a, b) => a - b);
 
+  const median = sortedPrices.length === 0
+    ? null
+    : sortedPrices.length % 2 === 1
+    ? sortedPrices[Math.floor(sortedPrices.length / 2)]
+    : (
+        sortedPrices[sortedPrices.length / 2 - 1] +
+        sortedPrices[sortedPrices.length / 2]
+      ) / 2;
   const endingSoonCount = filteredItems.filter((it) => endsWithinHours(it.itemEndDate, 2)).length;
 
   // Currency assumption: search results typically share one currency. We’ll use the first item’s currency if present.
@@ -106,6 +115,7 @@ const prices = filteredItems
   return {
     count: filteredItems.length,
     lowest,
+    median,
     average,
     highest,
     endingSoonCount,
