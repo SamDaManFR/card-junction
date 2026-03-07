@@ -95,6 +95,7 @@ const prices = filteredItems
   .filter((n): n is number => typeof n === "number");
 
   const lowest = prices.length ? Math.min(...prices) : null;
+  const average = prices.length ? Math.avg(...prices) : null;
   const highest = prices.length ? Math.max(...prices) : null;
 
   const endingSoonCount = filteredItems.filter((it) => endsWithinHours(it.itemEndDate, 2)).length;
