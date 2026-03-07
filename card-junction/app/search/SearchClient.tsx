@@ -188,30 +188,50 @@ return (
     </div>
 
     <div style={{ marginTop: 12 }} className="card">
-      <div className="muted small">Market Snapshot (active listings)</div>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
-        <span className="pill">Count: {snapshot.count}</span>
-        <span className="pill">
-          Lowest:{" "}
-          {snapshot.lowest === null
-            ? "—"
-            : new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: snapshot.currency,
-              }).format(snapshot.lowest)}
-        </span>
-        <span className="pill">
-          Highest:{" "}
-          {snapshot.highest === null
-            ? "—"
-            : new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: snapshot.currency,
-              }).format(snapshot.highest)}
-        </span>
-        <span className="pill">Ending &lt; 2h: {snapshot.endingSoonCount}</span>
-      </div>
-    </div>
+  <div className="muted small">Market Snapshot (active listings)</div>
+
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+
+    <span className="pill">
+      Count: {snapshot?.count ?? "—"}
+    </span>
+
+    <span className="pill">
+      Lowest:{" "}
+      {snapshot?.lowest == null
+        ? "—"
+        : new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: snapshot?.currency || "USD",
+          }).format(snapshot.lowest)}
+    </span>
+
+    <span className="pill">
+      Average:{" "}
+      {snapshot?.average == null
+        ? "—"
+        : new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: snapshot?.currency || "USD",
+          }).format(snapshot.average)}
+    </span>
+
+    <span className="pill">
+      Highest:{" "}
+      {snapshot?.highest == null
+        ? "—"
+        : new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: snapshot?.currency || "USD",
+          }).format(snapshot.highest)}
+    </span>
+
+    <span className="pill">
+      Ending &lt; 2h: {snapshot?.endingSoonCount ?? 0}
+    </span>
+
+  </div>
+</div>
 
     {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
 
