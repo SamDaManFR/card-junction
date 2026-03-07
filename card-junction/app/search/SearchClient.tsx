@@ -106,6 +106,7 @@ const prices = filteredItems
   return {
     count: filteredItems.length,
     lowest,
+    average,
     highest,
     endingSoonCount,
     currency,
