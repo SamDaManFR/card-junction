@@ -188,7 +188,7 @@ button.secondary { background: white; color: #111827; border-color: #e5e7eb; }
   }
 
   .side-rail.left {
-    left: 18px;
+    left: 50px;
     background-image: url("/decor/left-card.png");
     background-position: left top;
     transform: rotate(-6deg);
