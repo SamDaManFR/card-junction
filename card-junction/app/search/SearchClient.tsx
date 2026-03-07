@@ -219,6 +219,16 @@ return (
     </span>
 
     <span className="pill">
+      Median:{" "}
+      {snapshot?.median == null
+        ? "—"
+        : new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: snapshot?.currency || "USD",
+          }).format(snapshot.median)}
+    </span>
+
+    <span className="pill">
       Average:{" "}
       {snapshot?.average == null
         ? "—"
