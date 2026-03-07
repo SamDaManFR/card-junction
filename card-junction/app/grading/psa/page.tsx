@@ -35,7 +35,7 @@ export default function Page() {
     setResult(null);
 
     try {
-      const res = await fetch(`http://localhost:8000/psa/${cert}`);
+      const res = await fetch(`http://127.0.0.1:8000/psa/${cert}`);
       const data = await res.json();
 
       if (!res.ok) {
