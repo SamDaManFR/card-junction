@@ -66,6 +66,22 @@ function extractGrade(title: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
+function formatCurrency(value: number, currency: string) {
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+  }).format(value);
+}
+
+function getGradeLabel(title: string) {
+  const grade = extractGrade(title);
+  if (grade === 10) return "PSA 10";
+  if (grade === 9) return "PSA 9";
+  if (grade === 8) return "PSA 8";
+  //if (grade === 7) return "PSA 7";
+  return "Raw";
+}
+
 export default function Page() {
   const [certNumber, setCertNumber] = useState("");
   const [result, setResult] = useState<PsaResult | null>(null);
@@ -182,9 +198,18 @@ export default function Page() {
     "PSA 10": [],
     "PSA 9": [],
     "PSA 8": [],
-    "PSA 7": [],
+   // "PSA 7": [],
     "Raw": [],
   };
+
+  const gradeAverages = useMemo(() => {
+    return gradeBreakdown.reduce<Record<string, number>>((acc, entry) => {
+      if (entry.stats) {
+        acc[entry.grade] = entry.stats.avg;
+      }
+      return acc;
+    }, {});
+  }, [gradeBreakdown]);  
 
   for (const item of items) {
     const price = getPriceNumber(item.price);
@@ -195,7 +220,7 @@ export default function Page() {
     if (grade === 10) buckets["PSA 10"].push(price);
     else if (grade === 9) buckets["PSA 9"].push(price);
     else if (grade === 8) buckets["PSA 8"].push(price);
-    else if (grade === 7) buckets["PSA 7"].push(price);
+   // else if (grade === 7) buckets["PSA 7"].push(price);
     else buckets["Raw"].push(price);
   }
 
@@ -491,20 +516,59 @@ export default function Page() {
                       )}
 
                       <div>
-                        <p style={{ marginTop: 0, fontWeight: 700 }}>{it.title}</p>
-                        <p><strong>Price:</strong> {formatMoney(it.price)}</p>
-                        {it.itemEndDate && (
-                          <p>
-                            <strong>Ends:</strong>{" "}
-                            {new Date(it.itemEndDate).toLocaleString()}
-                          </p>
-                        )}
-                        {it.buyingOptions?.length ? (
-                          <p>
-                            <strong>Buying Options:</strong>{" "}
-                            {it.buyingOptions.join(", ")}
-                          </p>
-                        ) : null}
+  <p style={{ marginTop: 0, fontWeight: 700 }}>{it.title}</p>
+
+  {(() => {
+    const price = getPriceNumber(it.price);
+    const gradeLabel = getGradeLabel(it.title);
+    const bucketAverage = gradeAverages[gradeLabel];
+
+    if (
+      price == null ||
+      bucketAverage == null ||
+      bucketAverage <= 0 ||
+      price >= bucketAverage
+    ) {
+      return null;
+    }
+
+    const discountPct = Math.round(((bucketAverage - price) / bucketAverage) * 100);
+
+    if (discountPct < 10) return null;
+
+    return (
+      <div
+        style={{
+          display: "inline-block",
+          marginBottom: "8px",
+          padding: "6px 10px",
+          borderRadius: "999px",
+          background: "#ecfdf5",
+          border: "1px solid #a7f3d0",
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#065f46",
+        }}
+      >
+        🔥 {discountPct}% below {gradeLabel} avg
+      </div>
+    );
+  })()}
+
+  <p><strong>Price:</strong> {formatMoney(it.price)}</p>
+  {it.itemEndDate && (
+    <p>
+      <strong>Ends:</strong>{" "}
+      {new Date(it.itemEndDate).toLocaleString()}
+    </p>
+  )}
+  {it.buyingOptions?.length ? (
+    <p>
+      <strong>Buying Options:</strong>{" "}
+      {it.buyingOptions.join(", ")}
+    </p>
+  ) : null}
+</div>
                       </div>
                     </a>
                   ))}
