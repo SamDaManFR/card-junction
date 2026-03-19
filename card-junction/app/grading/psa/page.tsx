@@ -49,15 +49,13 @@ function getPriceNumber(p?: { value: string; currency: string }) {
 }
 
 function buildEbaySearchQuery(result: PsaResult) {
-  const gradeNumber = result.grade?.match(/\d+/)?.[0] || "";
-
   return [
     result.year,
     result.brand,
     result.subject,
     result.card_number ? `#${result.card_number}` : "",
     result.variety || "",
-    gradeNumber ? `PSA ${gradeNumber}` : "PSA",
+    // Removed PSA grade entirely
   ]
     .filter(Boolean)
     .join(" ");
