@@ -42,6 +42,13 @@ function formatMoney(p?: { value: string; currency: string }) {
   }).format(v);
 }
 
+function formatCurrency(value: number, currency: string) {
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+  }).format(value);
+}
+
 function getPriceNumber(p?: { value: string; currency: string }) {
   if (!p) return null;
   const n = Number(p.value);
@@ -55,7 +62,6 @@ function buildEbaySearchQuery(result: PsaResult) {
     result.subject,
     result.card_number ? `#${result.card_number}` : "",
     result.variety || "",
-    // Removed PSA grade entirely
   ]
     .filter(Boolean)
     .join(" ");
@@ -66,19 +72,11 @@ function extractGrade(title: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
-function formatCurrency(value: number, currency: string) {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency,
-  }).format(value);
-}
-
 function getGradeLabel(title: string) {
   const grade = extractGrade(title);
   if (grade === 10) return "PSA 10";
   if (grade === 9) return "PSA 9";
   if (grade === 8) return "PSA 8";
-  //if (grade === 7) return "PSA 7";
   return "Raw";
 }
 
@@ -175,10 +173,10 @@ export default function Page() {
       sortedPrices.length === 0
         ? null
         : sortedPrices.length % 2 === 1
-        ? sortedPrices[Math.floor(sortedPrices.length / 2)]
-        : (sortedPrices[sortedPrices.length / 2 - 1] +
-            sortedPrices[sortedPrices.length / 2]) /
-          2;
+          ? sortedPrices[Math.floor(sortedPrices.length / 2)]
+          : (sortedPrices[sortedPrices.length / 2 - 1] +
+              sortedPrices[sortedPrices.length / 2]) /
+            2;
 
     const currency =
       items.find((it) => it.price?.currency)?.price?.currency ?? "USD";
@@ -194,13 +192,50 @@ export default function Page() {
   }, [items]);
 
   const gradeBreakdown = useMemo(() => {
-  const buckets: Record<string, number[]> = {
-    "PSA 10": [],
-    "PSA 9": [],
-    "PSA 8": [],
-   // "PSA 7": [],
-    "Raw": [],
-  };
+    const buckets: Record<string, number[]> = {
+      "PSA 10": [],
+      "PSA 9": [],
+      "PSA 8": [],
+      Raw: [],
+    };
+
+    for (const item of items) {
+      const price = getPriceNumber(item.price);
+      if (price == null) continue;
+
+      const grade = extractGrade(item.title);
+
+      if (grade === 10) buckets["PSA 10"].push(price);
+      else if (grade === 9) buckets["PSA 9"].push(price);
+      else if (grade === 8) buckets["PSA 8"].push(price);
+      else buckets.Raw.push(price);
+    }
+
+    function stats(arr: number[]) {
+      if (!arr.length) return null;
+
+      const sorted = [...arr].sort((a, b) => a - b);
+      const avg = arr.reduce((s, v) => s + v, 0) / arr.length;
+
+      const median =
+        sorted.length % 2 === 1
+          ? sorted[Math.floor(sorted.length / 2)]
+          : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+
+      return {
+        count: arr.length,
+        avg,
+        median,
+        min: sorted[0],
+        max: sorted[sorted.length - 1],
+      };
+    }
+
+    return Object.entries(buckets).map(([grade, prices]) => ({
+      grade,
+      stats: stats(prices),
+    }));
+  }, [items]);
 
   const gradeAverages = useMemo(() => {
     return gradeBreakdown.reduce<Record<string, number>>((acc, entry) => {
@@ -209,47 +244,7 @@ export default function Page() {
       }
       return acc;
     }, {});
-  }, [gradeBreakdown]);  
-
-  for (const item of items) {
-    const price = getPriceNumber(item.price);
-    if (price == null) continue;
-
-    const grade = extractGrade(item.title);
-
-    if (grade === 10) buckets["PSA 10"].push(price);
-    else if (grade === 9) buckets["PSA 9"].push(price);
-    else if (grade === 8) buckets["PSA 8"].push(price);
-   // else if (grade === 7) buckets["PSA 7"].push(price);
-    else buckets["Raw"].push(price);
-  }
-
-  function stats(arr: number[]) {
-    if (!arr.length) return null;
-
-    const sorted = [...arr].sort((a, b) => a - b);
-    const avg = arr.reduce((s, v) => s + v, 0) / arr.length;
-
-    const median =
-      sorted.length % 2 === 1
-        ? sorted[Math.floor(sorted.length / 2)]
-        : (sorted[sorted.length / 2 - 1] +
-            sorted[sorted.length / 2]) / 2;
-
-    return {
-      count: arr.length,
-      avg,
-      median,
-      min: sorted[0],
-      max: sorted[sorted.length - 1],
-    };
-  }
-
-  return Object.entries(buckets).map(([grade, prices]) => ({
-    grade,
-    stats: stats(prices),
-  }));
-}, [items]);
+  }, [gradeBreakdown]);
 
   return (
     <main className="container">
@@ -322,17 +317,41 @@ export default function Page() {
             <h2 style={{ marginTop: 0 }}>{result.title}</h2>
 
             <div style={{ display: "grid", gap: "8px" }}>
-              <p><strong>Cert Number:</strong> {result.cert_number}</p>
-              <p><strong>Subject:</strong> {result.subject}</p>
-              <p><strong>Year:</strong> {result.year}</p>
-              <p><strong>Brand:</strong> {result.brand}</p>
-              <p><strong>Card Number:</strong> {result.card_number}</p>
-              <p><strong>Grade:</strong> {result.grade}</p>
-              <p><strong>Category:</strong> {result.category}</p>
-              <p><strong>Variety:</strong> {result.variety || "—"}</p>
-              <p><strong>Total Population:</strong> {result.total_population ?? "—"}</p>
-              <p><strong>Higher Grades:</strong> {result.population_higher ?? "—"}</p>
-              <p><strong>Source:</strong> {result.source}</p>
+              <p>
+                <strong>Cert Number:</strong> {result.cert_number}
+              </p>
+              <p>
+                <strong>Subject:</strong> {result.subject}
+              </p>
+              <p>
+                <strong>Year:</strong> {result.year}
+              </p>
+              <p>
+                <strong>Brand:</strong> {result.brand}
+              </p>
+              <p>
+                <strong>Card Number:</strong> {result.card_number}
+              </p>
+              <p>
+                <strong>Grade:</strong> {result.grade}
+              </p>
+              <p>
+                <strong>Category:</strong> {result.category}
+              </p>
+              <p>
+                <strong>Variety:</strong> {result.variety || "—"}
+              </p>
+              <p>
+                <strong>Total Population:</strong>{" "}
+                {result.total_population ?? "—"}
+              </p>
+              <p>
+                <strong>Higher Grades:</strong>{" "}
+                {result.population_higher ?? "—"}
+              </p>
+              <p>
+                <strong>Source:</strong> {result.source}
+              </p>
             </div>
           </div>
         )}
@@ -369,209 +388,201 @@ export default function Page() {
                     Lowest:{" "}
                     {snapshot.lowest == null
                       ? "—"
-                      : new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: snapshot.currency,
-                        }).format(snapshot.lowest)}
+                      : formatCurrency(snapshot.lowest, snapshot.currency)}
                   </span>
                   <span className="pill">
                     Median:{" "}
                     {snapshot.median == null
                       ? "—"
-                      : new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: snapshot.currency,
-                        }).format(snapshot.median)}
+                      : formatCurrency(snapshot.median, snapshot.currency)}
                   </span>
                   <span className="pill">
                     Average:{" "}
                     {snapshot.average == null
                       ? "—"
-                      : new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: snapshot.currency,
-                        }).format(snapshot.average)}
+                      : formatCurrency(snapshot.average, snapshot.currency)}
                   </span>
                   <span className="pill">
                     Highest:{" "}
                     {snapshot.highest == null
                       ? "—"
-                      : new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: snapshot.currency,
-                        }).format(snapshot.highest)}
+                      : formatCurrency(snapshot.highest, snapshot.currency)}
                   </span>
                 </div>
 
                 <div
-  style={{
-    marginTop: "20px",
-    padding: "16px",
-    borderRadius: "12px",
-    border: "1px solid #e5e7eb",
-    background: "#fff",
-  }}
->
-  <h3 style={{ marginTop: 0 }}>Price by Grade</h3>
+                  style={{
+                    marginTop: "20px",
+                    padding: "16px",
+                    borderRadius: "12px",
+                    border: "1px solid #e5e7eb",
+                    background: "#fff",
+                  }}
+                >
+                  <h3 style={{ marginTop: 0 }}>Price by Grade</h3>
 
-  <div style={{ display: "grid", gap: "10px" }}>
-    {gradeBreakdown.map(({ grade, stats }) => (
-      <div
-        key={grade}
-        style={{
-          padding: "10px",
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
-        }}
-      >
-        <strong>{grade}</strong>
+                  <div style={{ display: "grid", gap: "10px" }}>
+                    {gradeBreakdown.map(({ grade, stats }) => (
+                      <div
+                        key={grade}
+                        style={{
+                          padding: "10px",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <strong>{grade}</strong>
 
-        {stats ? (
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <span className="pill">Count: {stats.count}</span>
-            <span className="pill">
-              Avg:{" "}
-              {new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: snapshot.currency,
-              }).format(stats.avg)}
-            </span>
-            <span className="pill">
-              Median:{" "}
-              {new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: snapshot.currency,
-              }).format(stats.median)}
-            </span>
-            <span className="pill">
-              Low:{" "}
-              {new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: snapshot.currency,
-              }).format(stats.min)}
-            </span>
-            <span className="pill">
-              High:{" "}
-              {new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: snapshot.currency,
-              }).format(stats.max)}
-            </span>
-          </div>
-        ) : (
-          <p className="muted small">No data</p>
-        )}
-      </div>
-    ))}
-  </div>
-</div>
+                        {stats ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "10px",
+                              flexWrap: "wrap",
+                              marginTop: "8px",
+                            }}
+                          >
+                            <span className="pill">Count: {stats.count}</span>
+                            <span className="pill">
+                              Avg:{" "}
+                              {formatCurrency(stats.avg, snapshot.currency)}
+                            </span>
+                            <span className="pill">
+                              Median:{" "}
+                              {formatCurrency(stats.median, snapshot.currency)}
+                            </span>
+                            <span className="pill">
+                              Low:{" "}
+                              {formatCurrency(stats.min, snapshot.currency)}
+                            </span>
+                            <span className="pill">
+                              High:{" "}
+                              {formatCurrency(stats.max, snapshot.currency)}
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="muted small">No data</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                <div style={{ marginBottom: "12px" }}>
+                <div style={{ marginBottom: "12px", marginTop: "16px" }}>
                   <span className="muted small">
                     Showing {items.length} of {total} results
                   </span>
                 </div>
 
                 <div style={{ display: "grid", gap: "12px" }}>
-                  {items.map((it) => (
-                    <a
-                      key={it.itemId}
-                      href={it.itemWebUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "120px 1fr",
-                        gap: "12px",
-                        padding: "12px",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "10px",
-                        textDecoration: "none",
-                        color: "inherit",
-                        background: "#fff",
-                      }}
-                    >
-                      {it.image?.imageUrl ? (
-                        <Image
-                          src={it.image.imageUrl}
-                          alt={it.title}
-                          width={120}
-                          height={120}
-                          style={{
-                            width: "120px",
-                            height: "120px",
-                            objectFit: "cover",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: "120px",
-                            height: "120px",
-                            background: "#f3f4f6",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      )}
+                  {items.map((it) => {
+                    const price = getPriceNumber(it.price);
+                    const gradeLabel = getGradeLabel(it.title);
+                    const bucketAverage = gradeAverages[gradeLabel];
 
-                      <div>
-  <p style={{ marginTop: 0, fontWeight: 700 }}>{it.title}</p>
+                    const showDealBadge =
+                      price != null &&
+                      bucketAverage != null &&
+                      bucketAverage > 0 &&
+                      price < bucketAverage;
 
-  {(() => {
-    const price = getPriceNumber(it.price);
-    const gradeLabel = getGradeLabel(it.title);
-    const bucketAverage = gradeAverages[gradeLabel];
+                    const discountPct = showDealBadge
+                      ? Math.round(
+                          ((bucketAverage - price) / bucketAverage) * 100
+                        )
+                      : 0;
 
-    if (
-      price == null ||
-      bucketAverage == null ||
-      bucketAverage <= 0 ||
-      price >= bucketAverage
-    ) {
-      return null;
-    }
+                    return (
+                      <a
+                        key={it.itemId}
+                        href={it.itemWebUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "120px 1fr",
+                          gap: "12px",
+                          padding: "12px",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "10px",
+                          textDecoration: "none",
+                          color: "inherit",
+                          background: "#fff",
+                        }}
+                      >
+                        {it.image?.imageUrl ? (
+                          <Image
+                            src={it.image.imageUrl}
+                            alt={it.title}
+                            width={120}
+                            height={120}
+                            style={{
+                              width: "120px",
+                              height: "120px",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: "120px",
+                              height: "120px",
+                              background: "#f3f4f6",
+                              borderRadius: "8px",
+                            }}
+                          />
+                        )}
 
-    const discountPct = Math.round(((bucketAverage - price) / bucketAverage) * 100);
+                        <div>
+                          <p style={{ marginTop: 0, fontWeight: 700 }}>
+                            {it.title}
+                          </p>
 
-    if (discountPct < 10) return null;
+                          {showDealBadge && discountPct >= 10 && price != null && (
+                            <div
+                              style={{
+                                display: "inline-block",
+                                marginBottom: "8px",
+                                padding: "6px 10px",
+                                borderRadius: "999px",
+                                background: "#ecfdf5",
+                                border: "1px solid #a7f3d0",
+                                fontSize: "14px",
+                                fontWeight: 600,
+                                color: "#065f46",
+                              }}
+                            >
+                              🔥 {discountPct}% below {gradeLabel} avg (
+                              {formatCurrency(
+                                bucketAverage - price,
+                                snapshot.currency
+                              )}{" "}
+                              under)
+                            </div>
+                          )}
 
-    return (
-      <div
-        style={{
-          display: "inline-block",
-          marginBottom: "8px",
-          padding: "6px 10px",
-          borderRadius: "999px",
-          background: "#ecfdf5",
-          border: "1px solid #a7f3d0",
-          fontSize: "14px",
-          fontWeight: 600,
-          color: "#065f46",
-        }}
-      >
-        🔥 {discountPct}% below {gradeLabel} avg
-      </div>
-    );
-  })()}
+                          <p>
+                            <strong>Price:</strong> {formatMoney(it.price)}
+                          </p>
 
-  <p><strong>Price:</strong> {formatMoney(it.price)}</p>
-  {it.itemEndDate && (
-    <p>
-      <strong>Ends:</strong>{" "}
-      {new Date(it.itemEndDate).toLocaleString()}
-    </p>
-  )}
-  {it.buyingOptions?.length ? (
-    <p>
-      <strong>Buying Options:</strong>{" "}
-      {it.buyingOptions.join(", ")}
-    </p>
-  ) : null}
-</div>
-                      </div>
-                    </a>
-                  ))}
+                          {it.itemEndDate && (
+                            <p>
+                              <strong>Ends:</strong>{" "}
+                              {new Date(it.itemEndDate).toLocaleString()}
+                            </p>
+                          )}
+
+                          {it.buyingOptions?.length ? (
+                            <p>
+                              <strong>Buying Options:</strong>{" "}
+                              {it.buyingOptions.join(", ")}
+                            </p>
+                          ) : null}
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
 
                 {!items.length && <p>No active listings found.</p>}
