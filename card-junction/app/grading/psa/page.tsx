@@ -61,6 +61,11 @@ function buildEbaySearchQuery(result: PsaResult) {
     .join(" ");
 }
 
+function extractGrade(title: string): number | null {
+  const match = title.match(/PSA\s?(\d{1,2})/i);
+  return match ? Number(match[1]) : null;
+}
+
 export default function Page() {
   const [certNumber, setCertNumber] = useState("");
   const [result, setResult] = useState<PsaResult | null>(null);
@@ -171,6 +176,55 @@ export default function Page() {
       currency,
     };
   }, [items]);
+
+  const gradeBreakdown = useMemo(() => {
+  const buckets: Record<string, number[]> = {
+    "PSA 10": [],
+    "PSA 9": [],
+    "PSA 8": [],
+    "PSA 7": [],
+    "Raw": [],
+  };
+
+  for (const item of items) {
+    const price = getPriceNumber(item.price);
+    if (price == null) continue;
+
+    const grade = extractGrade(item.title);
+
+    if (grade === 10) buckets["PSA 10"].push(price);
+    else if (grade === 9) buckets["PSA 9"].push(price);
+    else if (grade === 8) buckets["PSA 8"].push(price);
+    else if (grade === 7) buckets["PSA 7"].push(price);
+    else buckets["Raw"].push(price);
+  }
+
+  function stats(arr: number[]) {
+    if (!arr.length) return null;
+
+    const sorted = [...arr].sort((a, b) => a - b);
+    const avg = arr.reduce((s, v) => s + v, 0) / arr.length;
+
+    const median =
+      sorted.length % 2 === 1
+        ? sorted[Math.floor(sorted.length / 2)]
+        : (sorted[sorted.length / 2 - 1] +
+            sorted[sorted.length / 2]) / 2;
+
+    return {
+      count: arr.length,
+      avg,
+      median,
+      min: sorted[0],
+      max: sorted[sorted.length - 1],
+    };
+  }
+
+  return Object.entries(buckets).map(([grade, prices]) => ({
+    grade,
+    stats: stats(prices),
+  }));
+}, [items]);
 
   return (
     <main className="container">
@@ -323,6 +377,69 @@ export default function Page() {
                         }).format(snapshot.highest)}
                   </span>
                 </div>
+
+                <div
+  style={{
+    marginTop: "20px",
+    padding: "16px",
+    borderRadius: "12px",
+    border: "1px solid #e5e7eb",
+    background: "#fff",
+  }}
+>
+  <h3 style={{ marginTop: 0 }}>Price by Grade</h3>
+
+  <div style={{ display: "grid", gap: "10px" }}>
+    {gradeBreakdown.map(({ grade, stats }) => (
+      <div
+        key={grade}
+        style={{
+          padding: "10px",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+        }}
+      >
+        <strong>{grade}</strong>
+
+        {stats ? (
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <span className="pill">Count: {stats.count}</span>
+            <span className="pill">
+              Avg:{" "}
+              {new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: snapshot.currency,
+              }).format(stats.avg)}
+            </span>
+            <span className="pill">
+              Median:{" "}
+              {new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: snapshot.currency,
+              }).format(stats.median)}
+            </span>
+            <span className="pill">
+              Low:{" "}
+              {new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: snapshot.currency,
+              }).format(stats.min)}
+            </span>
+            <span className="pill">
+              High:{" "}
+              {new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: snapshot.currency,
+              }).format(stats.max)}
+            </span>
+          </div>
+        ) : (
+          <p className="muted small">No data</p>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
 
                 <div style={{ marginBottom: "12px" }}>
                   <span className="muted small">
