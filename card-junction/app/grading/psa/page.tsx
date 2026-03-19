@@ -12,6 +12,12 @@ type PsaResult = {
   grade: string;
   category: string;
   source: string;
+  variety?: string;
+  spec_id?: number;
+  spec_number?: string;
+  label_type?: string;
+  total_population?: number;
+  population_higher?: number;
   message?: string;
 };
 
@@ -126,6 +132,9 @@ export default function Page() {
               <p><strong>Card Number:</strong> {result.card_number}</p>
               <p><strong>Grade:</strong> {result.grade}</p>
               <p><strong>Category:</strong> {result.category}</p>
+              <p><strong>Variety:</strong> {result.variety}</p>
+              <p><strong>Total Population:</strong> {result.total_population}</p>
+              <p><strong>Higher Grades:</strong> {result.population_higher}</p>
               <p><strong>Source:</strong> {result.source}</p>
             </div>
           </div>
