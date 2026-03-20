@@ -265,7 +265,7 @@ export default function Page() {
       const discountAmount = bucketAverage - price;
       const discountPct = Math.round((discountAmount / bucketAverage) * 100);
 
-      if (discountPct < 10) return null;
+      if (discountPct < 5) return null;
 
       return {
         item,
