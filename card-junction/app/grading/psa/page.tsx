@@ -246,6 +246,52 @@ export default function Page() {
     }, {});
   }, [gradeBreakdown]);
 
+  const bestDeals = useMemo(() => {
+  return items
+    .map((item) => {
+      const price = getPriceNumber(item.price);
+      const gradeLabel = getGradeLabel(item.title);
+      const bucketAverage = gradeAverages[gradeLabel];
+
+      if (
+        price == null ||
+        bucketAverage == null ||
+        bucketAverage <= 0 ||
+        price >= bucketAverage
+      ) {
+        return null;
+      }
+
+      const discountAmount = bucketAverage - price;
+      const discountPct = Math.round((discountAmount / bucketAverage) * 100);
+
+      if (discountPct < 10) return null;
+
+      return {
+        item,
+        gradeLabel,
+        price,
+        bucketAverage,
+        discountAmount,
+        discountPct,
+      };
+    })
+    .filter(
+      (
+        deal
+      ): deal is {
+        item: Item;
+        gradeLabel: string;
+        price: number;
+        bucketAverage: number;
+        discountAmount: number;
+        discountPct: number;
+      } => deal !== null
+    )
+    .sort((a, b) => b.discountPct - a.discountPct)
+    .slice(0, 5);
+  }, [items, gradeAverages]);
+
   return (
     <main className="container">
       <div className="card">
@@ -467,6 +513,78 @@ export default function Page() {
                     ))}
                   </div>
                 </div>
+
+                {bestDeals.length > 0 && (
+  <div
+    style={{
+      marginTop: "20px",
+      padding: "16px",
+      borderRadius: "12px",
+      border: "1px solid #e5e7eb",
+      background: "#fff",
+    }}
+  >
+    <h3 style={{ marginTop: 0 }}>Best Deals</h3>
+
+    <div style={{ display: "grid", gap: "12px" }}>
+      {bestDeals.map(
+        ({
+          item,
+          gradeLabel,
+          discountPct,
+          discountAmount,
+          bucketAverage,
+        }) => (
+          <a
+            key={item.itemId}
+            href={item.itemWebUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: "block",
+              padding: "12px",
+              border: "1px solid #e5e7eb",
+              borderRadius: "10px",
+              textDecoration: "none",
+              color: "inherit",
+              background: "#fff",
+            }}
+          >
+            <p style={{ marginTop: 0, fontWeight: 700 }}>{item.title}</p>
+
+            <div
+              style={{
+                display: "inline-block",
+                marginBottom: "8px",
+                padding: "6px 10px",
+                borderRadius: "999px",
+                background: "#ecfdf5",
+                border: "1px solid #a7f3d0",
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "#065f46",
+              }}
+            >
+              🔥 {discountPct}% below {gradeLabel} avg
+            </div>
+
+            <p>
+              <strong>Price:</strong> {formatMoney(item.price)}
+            </p>
+            <p>
+              <strong>{gradeLabel} Avg:</strong>{" "}
+              {formatCurrency(bucketAverage, snapshot.currency)}
+            </p>
+            <p>
+              <strong>Under Avg By:</strong>{" "}
+              {formatCurrency(discountAmount, snapshot.currency)}
+            </p>
+          </a>
+        )
+      )}
+    </div>
+  </div>
+)}
 
                 <div style={{ marginBottom: "12px", marginTop: "16px" }}>
                   <span className="muted small">
