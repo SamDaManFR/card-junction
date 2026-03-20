@@ -539,7 +539,7 @@ export default function Page() {
                             {it.title}
                           </p>
 
-                          {showDealBadge && discountPct >= 10 && price != null && (
+                          {showDealBadge && discountPct >= 1 && price != null && (
                             <div
                               style={{
                                 display: "inline-block",
