@@ -103,9 +103,7 @@ export default async function ItemPage({
   ))}
 </div>
 
-  <div className="muted small" style={{ marginTop: 10 }}>
-    Tip: Later we can replace these pills with logos (same links).
-  </div>
+
 </div>
  
               </div>

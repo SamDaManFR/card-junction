@@ -133,9 +133,11 @@ const quickSearches = [
 ];
 
 return (
-  <div className="card">
-    <div className="muted small">Quick searches (both vintage + modern)</div>
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8, marginBottom: 12 }}>
+  <section className="card search-panel" aria-labelledby="search-title">
+    <h2 id="search-title" className="search-panel-title">Search the marketplace</h2>
+    <div className="quick-searches">
+    <div className="muted small">Start with a player or set</div>
+    <div className="quick-search-buttons">
       {quickSearches.map((s) => (
         <button
           key={s.label}
@@ -151,10 +153,12 @@ return (
       ))}
     </div>
 
-    <div className="row">
+    </div>
+    <div className="row search-fields">
       <div>
-        <div className="muted small">Search</div>
+        <label htmlFor="card-search">Player, card, or set</label>
         <input
+          id="card-search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…"
@@ -162,8 +166,8 @@ return (
       </div>
 
       <div>
-        <div className="muted small">Mode</div>
-        <select value={mode} onChange={(e) => setMode(e.target.value as any)}>
+        <label htmlFor="buying-mode">Buying format</label>
+        <select id="buying-mode" value={mode} onChange={(e) => setMode(e.target.value as any)}>
           <option value="all">All</option>
           <option value="auction">Auctions</option>
           <option value="buynow">Buy It Now</option>
@@ -171,8 +175,8 @@ return (
       </div>
 
       <div>
-        <div className="muted small">Grade (PSA)</div>
-        <select value={grade} onChange={(e) => setGrade(e.target.value as any)}>
+        <label htmlFor="psa-grade">PSA grade</label>
+        <select id="psa-grade" value={grade} onChange={(e) => setGrade(e.target.value as any)}>
           <option value="all">All grades</option>
           <option value="10">PSA 10</option>
           <option value="9">PSA 9</option>
@@ -182,8 +186,8 @@ return (
       </div>
     </div>
 
-    <div style={{ display: "flex", gap: 10, marginTop: 12, alignItems: "center" }}>
-      <button onClick={runSearch} disabled={loading}>
+    <div className="search-actions">
+      <button className="search-submit" onClick={runSearch} disabled={loading}>
         {loading ? "Searching…" : "Search eBay"}
       </button>
       <button
@@ -292,6 +296,6 @@ return (
         );
       })}
     </div>
-  </div>
+  </section>
 );
 }

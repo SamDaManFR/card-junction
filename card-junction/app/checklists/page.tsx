@@ -4,10 +4,9 @@ export default function ChecklistsPage() {
   const sets = (checklist as any).sets || [];
   return (
     <main className="container">
-      <h1 className="h1">Checklists (starter)</h1>
+      <h1 className="h1">Card checklists</h1>
       <p className="muted">
-        MVP includes an example JSON checklist file so you can start publishing your own structured checklists.
-        Next step is moving this into Postgres and adding a real set browser.
+        Explore sample checklists organized by year, brand, and set. These examples are not complete set catalogs.
       </p>
 
       <div className="grid" style={{marginTop: 14}}>
