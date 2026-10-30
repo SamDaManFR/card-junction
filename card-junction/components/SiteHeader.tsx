@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -45,7 +44,7 @@ export default function SiteHeader() {
     }}>
       <div className="header-inner">
         <Link href="/" className="brand" onClick={close} aria-label="Card Junction home">
-          <Image src="/logo.png" alt="CARD/JUNCTION" width={240} height={60} priority />
+          <span className="brand-wordmark" aria-hidden="true"><span className="brand-mark">╱</span>CARD<span className="brand-junction">JUNCTION</span></span>
         </Link>
         <button ref={toggle} className="nav-toggle" aria-expanded={mobileOpen} aria-controls="site-navigation" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? "Close" : "Menu"}<span aria-hidden="true">{mobileOpen ? " ×" : " ☰"}</span>

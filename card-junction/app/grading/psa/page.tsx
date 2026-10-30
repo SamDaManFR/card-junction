@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
+import ListingCard from "@/components/ListingCard";
+import MarketSnapshot from "@/components/MarketSnapshot";
 
 type Item = {
   itemId: string;
@@ -421,40 +422,7 @@ export default function Page() {
 
             {!listingLoading && (
               <>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    flexWrap: "wrap",
-                    marginBottom: "16px",
-                  }}
-                >
-                  <span className="pill">Count: {snapshot.count}</span>
-                  <span className="pill">
-                    Lowest:{" "}
-                    {snapshot.lowest == null
-                      ? "—"
-                      : formatCurrency(snapshot.lowest, snapshot.currency)}
-                  </span>
-                  <span className="pill">
-                    Median:{" "}
-                    {snapshot.median == null
-                      ? "—"
-                      : formatCurrency(snapshot.median, snapshot.currency)}
-                  </span>
-                  <span className="pill">
-                    Average:{" "}
-                    {snapshot.average == null
-                      ? "—"
-                      : formatCurrency(snapshot.average, snapshot.currency)}
-                  </span>
-                  <span className="pill">
-                    Highest:{" "}
-                    {snapshot.highest == null
-                      ? "—"
-                      : formatCurrency(snapshot.highest, snapshot.currency)}
-                  </span>
-                </div>
+                <MarketSnapshot items={items} />
 
                 <div
                   style={{
@@ -592,115 +560,8 @@ export default function Page() {
                   </span>
                 </div>
 
-                <div style={{ display: "grid", gap: "12px" }}>
-                  {items.map((it) => {
-                    const price = getPriceNumber(it.price);
-                    const gradeLabel = getGradeLabel(it.title);
-                    const bucketAverage = gradeAverages[gradeLabel];
-
-                    const showDealBadge =
-                      price != null &&
-                      bucketAverage != null &&
-                      bucketAverage > 0 &&
-                      price < bucketAverage;
-
-                    const discountPct = showDealBadge
-                      ? Math.round(
-                          ((bucketAverage - price) / bucketAverage) * 100
-                        )
-                      : 0;
-
-                    return (
-                      <a
-                        key={it.itemId}
-                        href={it.itemWebUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "120px 1fr",
-                          gap: "12px",
-                          padding: "12px",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "10px",
-                          textDecoration: "none",
-                          color: "inherit",
-                          background: "#fff",
-                        }}
-                      >
-                        {it.image?.imageUrl ? (
-                          <Image
-                            src={it.image.imageUrl}
-                            alt={it.title}
-                            width={120}
-                            height={120}
-                            style={{
-                              width: "120px",
-                              height: "120px",
-                              objectFit: "cover",
-                              borderRadius: "8px",
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: "120px",
-                              height: "120px",
-                              background: "#f3f4f6",
-                              borderRadius: "8px",
-                            }}
-                          />
-                        )}
-
-                        <div>
-                          <p style={{ marginTop: 0, fontWeight: 700 }}>
-                            {it.title}
-                          </p>
-
-                          {showDealBadge && discountPct >= 5 && price != null && (
-                            <div
-                              style={{
-                                display: "inline-block",
-                                marginBottom: "8px",
-                                padding: "6px 10px",
-                                borderRadius: "999px",
-                                background: "#ecfdf5",
-                                border: "1px solid #a7f3d0",
-                                fontSize: "14px",
-                                fontWeight: 600,
-                                color: "#065f46",
-                              }}
-                            >
-                              🔥 {discountPct}% below {gradeLabel} avg (
-                              {formatCurrency(
-                                bucketAverage - price,
-                                snapshot.currency
-                              )}{" "}
-                              under)
-                            </div>
-                          )}
-
-                          <p>
-                            <strong>Price:</strong> {formatMoney(it.price)}
-                          </p>
-
-                          {it.itemEndDate && (
-                            <p>
-                              <strong>Ends:</strong>{" "}
-                              {new Date(it.itemEndDate).toLocaleString()}
-                            </p>
-                          )}
-
-                          {it.buyingOptions?.length ? (
-                            <p>
-                              <strong>Buying Options:</strong>{" "}
-                              {it.buyingOptions.join(", ")}
-                            </p>
-                          ) : null}
-                        </div>
-                      </a>
-                    );
-                  })}
+                <div className="results listing-results">
+                  {items.map(item => <ListingCard key={item.itemId} item={item} external />)}
                 </div>
 
                 {!items.length && <p>No active listings found.</p>}

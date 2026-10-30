@@ -1,301 +1,278 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { extractPsaGradeAndCert } from "@/lib/parse";
-import Image from "next/image";
+import ListingCard, { Listing } from "@/components/ListingCard";
+import MarketSnapshot from "@/components/MarketSnapshot";
 
-type Item = {
-  itemId: string;
-  title: string;
-  itemWebUrl: string;
-  image?: { imageUrl: string };
-  price?: { value: string; currency: string };
-  itemEndDate?: string;
-  buyingOptions?: string[];
-};
-
-function formatMoney(p?: { value: string; currency: string }) {
-  if (!p) return "—";
-  const v = Number(p.value);
-  if (Number.isNaN(v)) return `${p.value} ${p.currency}`;
-  return new Intl.NumberFormat(undefined, { style: "currency", currency: p.currency }).format(v);
-}
-
-function formatEnds(end?: string) {
-  if (!end) return "";
-  const d = new Date(end);
-  const ms = d.getTime() - Date.now();
-  if (Number.isNaN(ms)) return "";
-  const hours = Math.max(0, Math.floor(ms / 3_600_000));
-  const mins = Math.max(0, Math.floor((ms % 3_600_000) / 60_000));
-  return `Ends in ${hours}h ${mins}m`;
-}
-
-function getPriceNumber(p?: { value: string; currency: string }) {
-  if (!p) return null;
-  const n = Number(p.value);
-  return Number.isFinite(n) ? n : null;
-}
-
-function endsWithinHours(end?: string, hours = 2) {
-  if (!end) return false;
-  const ms = new Date(end).getTime() - Date.now();
-  if (!Number.isFinite(ms)) return false;
-  return ms > 0 && ms <= hours * 3_600_000;
-}
+type Item = Listing;
 
 export default function SearchClient() {
   const [q, setQ] = useState("Ohtani rookie");
-  const [mode, setMode] = useState<"all"|"auction"|"buynow">("all");
+  const [mode, setMode] = useState<"all" | "auction" | "buynow">("all");
   const [items, setItems] = useState<Item[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [grade, setGrade] = useState<"all" | "7" | "8" | "9" | "10">("all");
 
+  const [searched, setSearched] = useState(false);
+  const requestVersion = useRef(0);
+
   async function runSearch() {
+    const version = ++requestVersion.current;
+    setSearched(true);
     setError("");
     setLoading(true);
     try {
-      const res = await fetch(`/api/ebay/search?q=${encodeURIComponent(q)}&mode=${mode}`);
+      const res = await fetch(
+        `/api/ebay/search?q=${encodeURIComponent(q)}&mode=${mode}`,
+      );
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Search failed");
+      if (version !== requestVersion.current) return;
       const arr = (json.itemSummaries || []) as Item[];
-// Default: sort by ending soon (items without end time go last).
-arr.sort((a, b) => {
-  const ta = a.itemEndDate ? new Date(a.itemEndDate).getTime() : Number.POSITIVE_INFINITY;
-  const tb = b.itemEndDate ? new Date(b.itemEndDate).getTime() : Number.POSITIVE_INFINITY;
-  return ta - tb;
-});
-setItems(arr);
+      // Default: sort by ending soon (items without end time go last).
+      arr.sort((a, b) => {
+        const ta = a.itemEndDate
+          ? new Date(a.itemEndDate).getTime()
+          : Number.POSITIVE_INFINITY;
+        const tb = b.itemEndDate
+          ? new Date(b.itemEndDate).getTime()
+          : Number.POSITIVE_INFINITY;
+        return ta - tb;
+      });
+      setItems(arr);
       setTotal(json.total || 0);
     } catch (e: any) {
-      setError(e?.message || "Error");
+      if (version === requestVersion.current) {
+        setError(e?.message || "Search failed");
+        setItems([]);
+        setTotal(0);
+      }
     } finally {
-      setLoading(false);
+      if (version === requestVersion.current) setLoading(false);
     }
   }
 
   const subtitle = useMemo(() => {
-    const extra = mode === "auction" ? "Auctions only" : mode === "buynow" ? "Buy It Now only" : "Auctions + Buy It Now";
+    const extra =
+      mode === "auction"
+        ? "Auctions only"
+        : mode === "buynow"
+          ? "Buy It Now only"
+          : "Auctions + Buy It Now";
     return `${extra} • PSA-only • Graded only • Sorted: ending soon`;
   }, [mode]);
-//  #addedhere
-const filteredItems = useMemo(() => {
-  if (grade === "all") return items;
-  return items.filter((it) => {
-    const { psaGrade } = extractPsaGradeAndCert(it.title);
-    return psaGrade === grade;
-  });
-}, [items, grade]);
+  const filteredItems = useMemo(() => {
+    if (grade === "all") return items;
+    return items.filter((it) => {
+      const { psaGrade } = extractPsaGradeAndCert(it.title);
+      return psaGrade === grade;
+    });
+  }, [items, grade]);
 
-const snapshot = useMemo(() => {
-const prices = filteredItems
-  .map((it) => getPriceNumber(it.price))
-  .filter((n): n is number => typeof n === "number");
+  const quickSearches = [
+    { label: "Vintage: 1952 Topps Mantle", q: "1952 Topps Mantle" },
+    {
+      label: "Vintage: 1989 Upper Deck Griffey",
+      q: "1989 Upper Deck Ken Griffey Jr #1",
+    },
+    { label: "Modern: Trout rookie", q: "Mike Trout rookie" },
+    { label: "Modern: Ohtani Bowman", q: "Ohtani Bowman rookie" },
+    { label: "Both: Topps Chrome", q: "Topps Chrome" },
+  ];
 
-  const lowest = prices.length ? Math.min(...prices) : null;
-  const average = prices.length ? prices.reduce((sum, p) => sum + p, 0) / prices.length: null;
-  const highest = prices.length ? Math.max(...prices) : null;
-  const sortedPrices = [...prices].sort((a, b) => a - b);
+  return (
+    <>
+      <section className="card search-panel" aria-labelledby="search-title">
+        <h2 id="search-title" className="search-panel-title">
+          Search the marketplace
+        </h2>
+        <div className="quick-searches">
+          <div className="muted small">Start with a player or set</div>
+          <div className="quick-search-buttons">
+            {quickSearches.map((s) => (
+              <button
+                key={s.label}
+                className="secondary"
+                onClick={() => {
+                  setQ(s.q);
+                }}
+                type="button"
+                style={{ padding: "8px 10px" }}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="row search-fields">
+          <div>
+            <label htmlFor="card-search">Player, card, or set</label>
+            <input
+              id="card-search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…"
+            />
+          </div>
 
-  const median = sortedPrices.length === 0
-    ? null
-    : sortedPrices.length % 2 === 1
-    ? sortedPrices[Math.floor(sortedPrices.length / 2)]
-    : (
-        sortedPrices[sortedPrices.length / 2 - 1] +
-        sortedPrices[sortedPrices.length / 2]
-      ) / 2;
-  const endingSoonCount = filteredItems.filter((it) => endsWithinHours(it.itemEndDate, 2)).length;
+          <div>
+            <label htmlFor="buying-mode">Buying format</label>
+            <select
+              id="buying-mode"
+              value={mode}
+              onChange={(e) => setMode(e.target.value as any)}
+            >
+              <option value="all">All</option>
+              <option value="auction">Auctions</option>
+              <option value="buynow">Buy It Now</option>
+            </select>
+          </div>
 
-  // Currency assumption: search results typically share one currency. We’ll use the first item’s currency if present.
-  const currency = filteredItems.find((it) => it.price?.currency)?.price?.currency ?? "USD";
+          <div>
+            <label htmlFor="psa-grade">PSA grade</label>
+            <select
+              id="psa-grade"
+              value={grade}
+              onChange={(e) => setGrade(e.target.value as any)}
+            >
+              <option value="all">All grades</option>
+              <option value="10">PSA 10</option>
+              <option value="9">PSA 9</option>
+              <option value="8">PSA 8</option>
+              <option value="7">PSA 7</option>
+            </select>
+          </div>
+        </div>
 
-  return {
-    count: filteredItems.length,
-    lowest,
-    median,
-    average,
-    highest,
-    endingSoonCount,
-    currency,
-  };
-}, [filteredItems]);
- //  #endedhere
-     
-const quickSearches = [
-  { label: "Vintage: 1952 Topps Mantle", q: "1952 Topps Mantle" },
-  { label: "Vintage: 1989 Upper Deck Griffey", q: "1989 Upper Deck Ken Griffey Jr #1" },
-  { label: "Modern: Trout rookie", q: "Mike Trout rookie" },
-  { label: "Modern: Ohtani Bowman", q: "Ohtani Bowman rookie" },
-  { label: "Both: Topps Chrome", q: "Topps Chrome" },
-];
-
-return (
-  <section className="card search-panel" aria-labelledby="search-title">
-    <h2 id="search-title" className="search-panel-title">Search the marketplace</h2>
-    <div className="quick-searches">
-    <div className="muted small">Start with a player or set</div>
-    <div className="quick-search-buttons">
-      {quickSearches.map((s) => (
-        <button
-          key={s.label}
-          className="secondary"
-          onClick={() => {
-            setQ(s.q);
-          }}
-          type="button"
-          style={{ padding: "8px 10px" }}
-        >
-          {s.label}
-        </button>
-      ))}
-    </div>
-
-    </div>
-    <div className="row search-fields">
-      <div>
-        <label htmlFor="card-search">Player, card, or set</label>
-        <input
-          id="card-search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Try: 1952 Mantle, Trout rookie, Topps Chrome…"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="buying-mode">Buying format</label>
-        <select id="buying-mode" value={mode} onChange={(e) => setMode(e.target.value as any)}>
-          <option value="all">All</option>
-          <option value="auction">Auctions</option>
-          <option value="buynow">Buy It Now</option>
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="psa-grade">PSA grade</label>
-        <select id="psa-grade" value={grade} onChange={(e) => setGrade(e.target.value as any)}>
-          <option value="all">All grades</option>
-          <option value="10">PSA 10</option>
-          <option value="9">PSA 9</option>
-          <option value="8">PSA 8</option>
-          <option value="7">PSA 7</option>
-        </select>
-      </div>
-    </div>
-
-    <div className="search-actions">
-      <button className="search-submit" onClick={runSearch} disabled={loading}>
-        {loading ? "Searching…" : "Search eBay"}
-      </button>
-      <button
-        className="secondary"
-        onClick={() => {
-          setQ("");
-          setItems([]);
-          setTotal(0);
-        }}
-      >
-        Clear
-      </button>
-      <div className="muted small">{subtitle}</div>
-    </div>
-
-    <div style={{ marginTop: 12 }} className="card">
-  <div className="muted small">Market Snapshot (active listings)</div>
-
-  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
-
-    <span className="pill">
-      Count: {snapshot?.count ?? "—"}
-    </span>
-
-    <span className="pill">
-      Lowest:{" "}
-      {snapshot?.lowest == null
-        ? "—"
-        : new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: snapshot?.currency || "USD",
-          }).format(snapshot.lowest)}
-    </span>
-
-    <span className="pill">
-      Median:{" "}
-      {snapshot?.median == null
-        ? "—"
-        : new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: snapshot?.currency || "USD",
-          }).format(snapshot.median)}
-    </span>
-
-    <span className="pill">
-      Average:{" "}
-      {snapshot?.average == null
-        ? "—"
-        : new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: snapshot?.currency || "USD",
-          }).format(snapshot.average)}
-    </span>
-
-    <span className="pill">
-      Highest:{" "}
-      {snapshot?.highest == null
-        ? "—"
-        : new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: snapshot?.currency || "USD",
-          }).format(snapshot.highest)}
-    </span>
-
-    <span className="pill">
-      Ending &lt; 2h: {snapshot?.endingSoonCount ?? 0}
-    </span>
-
-  </div>
-</div>
-
-    {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
-
-    <div style={{ marginTop: 14 }} className="muted small">
-      Showing {filteredItems.length} of {total} results
-    </div>
-
-    <div style={{ marginTop: 12 }} className="results">
-      {filteredItems.map((it) => {
-        const { psaGrade, psaCert } = extractPsaGradeAndCert(it.title);
-        const ends = formatEnds(it.itemEndDate);
-
-        return (
-          <a
-            key={it.itemId}
-            className="card"
-            href={`/items/${encodeURIComponent(it.itemId)}`}
-            style={{ textDecoration: "none" }}
+        <div className="search-actions">
+          <button
+            className="search-submit"
+            onClick={runSearch}
+            disabled={loading}
           >
-            {it.image?.imageUrl ? (
-              <Image className="itemimg" src={it.image.imageUrl} alt={it.title} width={640} height={640} />
-            ) : (
-              <div className="itemimg" />
-            )}
+            {loading ? "Searching…" : "Search eBay"}
+          </button>
+          <button
+            className="secondary"
+            onClick={() => {
+              ++requestVersion.current;
+              setLoading(false);
+              setError("");
+              setSearched(false);
+              setQ("");
+              setItems([]);
+              setTotal(0);
+            }}
+          >
+            Clear
+          </button>
+          <div className="muted small">{subtitle}</div>
+        </div>
+      </section>
 
-            <div style={{ height: 10 }} />
-            <div style={{ fontWeight: 700, lineHeight: 1.3 }}>{it.title}</div>
-
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-              <span className="pill">{formatMoney(it.price)}</span>
-              {psaGrade ? <span className="pill">PSA {psaGrade}</span> : <span className="pill">PSA (unknown)</span>}
-              {psaCert ? <span className="pill">Cert {psaCert}</span> : null}
-              {ends ? <span className="pill">{ends}</span> : null}
+      <MarketSnapshot
+        items={loading || error ? [] : filteredItems}
+        loading={loading}
+      />
+      <section
+        className="results-section"
+        aria-labelledby="results-title"
+        aria-busy={loading}
+      >
+        <div className="results-heading">
+          <div>
+            <p className="eyebrow">The marketplace</p>
+            <h2 id="results-title">
+              {searched ? "Search results" : "Your next find starts here"}
+            </h2>
+          </div>
+          <p className="muted small" role="status">
+            {loading
+              ? "Searching active eBay listings…"
+              : searched && !error
+                ? `${filteredItems.length} displayed · ${items.length} loaded · ${total.toLocaleString()} matches on eBay`
+                : "PSA-graded baseball cards"}
+          </p>
+        </div>
+        {loading ? (
+          <>
+            <p className="sr-only" role="status">
+              Loading listings. Please wait.
+            </p>
+            <div className="results listing-results" aria-hidden="true">
+              {Array.from({ length: 6 }, (_, index) => (
+                <div className="listing-skeleton" key={index}>
+                  <div className="skeleton-image" />
+                  <div className="skeleton-line" />
+                  <div className="skeleton-line short" />
+                </div>
+              ))}
             </div>
-          </a>
-        );
-      })}
-    </div>
-  </section>
-);
+          </>
+        ) : error ? (
+          <div className="results-state error-state" role="alert">
+            <span className="state-symbol" aria-hidden="true">
+              !
+            </span>
+            <h3>We couldn’t load the listings</h3>
+            <p>
+              Your search and filters are still here. Try again in a moment.
+            </p>
+            <details>
+              <summary>Error details</summary>
+              <p>{error}</p>
+            </details>
+            <button onClick={runSearch}>Try again</button>
+          </div>
+        ) : !searched ? (
+          <div className="results-state">
+            <span className="state-symbol" aria-hidden="true">
+              ⌕
+            </span>
+            <h3>Search by player, card, or set</h3>
+            <p>
+              Choose a quick search or enter your own, then select Search eBay
+              to explore active listings and their price snapshot.
+            </p>
+          </div>
+        ) : !filteredItems.length ? (
+          <div className="results-state">
+            <span className="state-symbol" aria-hidden="true">
+              ⌕
+            </span>
+            <h3>
+              {items.length
+                ? "No loaded listings match this grade"
+                : "No listings found"}
+            </h3>
+            <p>
+              {items.length
+                ? "Try All grades to see the rest of your loaded sample."
+                : "Try a broader player name or set, or switch the buying format."}
+            </p>
+            {grade !== "all" && (
+              <button className="secondary" onClick={() => setGrade("all")}>
+                Show all grades
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <p className="results-note">
+              Sorted by ending soon within the loaded sample. Grade filtering
+              applies to this sample, not all eBay matches.
+            </p>
+            <div className="results listing-results">
+              {filteredItems.map((item) => (
+                <ListingCard key={item.itemId} item={item} />
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    </>
+  );
 }
