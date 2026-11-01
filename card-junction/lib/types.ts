@@ -5,6 +5,7 @@ export type EbayItemSummary = {
   title: string;
   itemWebUrl: string;
   image?: { imageUrl: string };
+  thumbnailImages?: Array<{ imageUrl: string }>;
   price?: { value: string; currency: string };
   shippingOptions?: Array<{ shippingCost?: { value: string; currency: string } }>;
   buyingOptions?: BuyingOption[];

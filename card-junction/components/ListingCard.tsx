@@ -9,6 +9,7 @@ export type Listing = {
   title: string;
   itemWebUrl: string;
   image?: { imageUrl: string };
+  thumbnailImages?: Array<{ imageUrl: string }>;
   price?: { value: string; currency: string };
   itemEndDate?: string;
   buyingOptions?: string[];
@@ -33,6 +34,8 @@ export default function ListingCard({
   external?: boolean;
 }) {
   const [failedImage, setFailedImage] = useState("");
+  // Browse search supplies the larger primary photo in thumbnailImages.
+  const imageUrl = item.thumbnailImages?.[0]?.imageUrl || item.image?.imageUrl;
   const { psaGrade, psaCert } = extractPsaGradeAndCert(item.title);
   const amount = item.price?.value.trim() ? Number(item.price.value) : NaN;
   const end = item.itemEndDate ? new Date(item.itemEndDate) : null;
@@ -47,14 +50,14 @@ export default function ListingCard({
       rel={external ? "noreferrer" : undefined}
     >
       <div className="listing-image">
-        {item.image?.imageUrl && failedImage !== item.image.imageUrl ? (
+        {imageUrl && failedImage !== imageUrl ? (
           <Image
-            src={item.image.imageUrl}
+            src={imageUrl}
             alt={item.title}
             width={480}
             height={640}
             sizes="(max-width: 639px) 90vw, (max-width: 1079px) 44vw, 360px"
-            onError={() => setFailedImage(item.image!.imageUrl)}
+            onError={() => setFailedImage(imageUrl)}
           />
         ) : (
           <span className="image-placeholder">Image unavailable</span>
